@@ -92,7 +92,7 @@ void UAlbertaBotModule::onEnd(bool isWinner)
 
 void UAlbertaBotModule::onFrame()
 {
-	BWAPI::Broodwar->printf("David Yu 1264181");
+	//BWAPI::Broodwar->printf("David Yu 1264181");
 	if (Options::Modules::USING_UNIT_COMMAND_MGR)
 	{
 		UnitCommandManager::Instance().update();
