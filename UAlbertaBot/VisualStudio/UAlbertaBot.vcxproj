@@ -108,6 +108,9 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateMapFile>true</GenerateMapFile>
     </Link>
+    <PostBuildEvent>
+      <Command>copy Release\UAlbertaBot.dll C:\StarCraft\bwapi-data\AI /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\base\BuildLearner.cpp" />
