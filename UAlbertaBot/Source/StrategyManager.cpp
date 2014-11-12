@@ -31,7 +31,8 @@ void StrategyManager::addStrategies()
 	//protossOpeningBook[ProtossDarkTemplar]	= "0 0 0 0 1 3 0 7 5 0 0 12 3 13 0 22 22 22 22 0 1 0";
     protossOpeningBook[ProtossDarkTemplar]	=     "0 0 0 0 1 0 3 0 7 0 5 0 12 0 13 3 22 22 1 22 22 0 1 0";
 	protossOpeningBook[ProtossDragoons]		= "0 0 0 0 1 0 0 3 0 7 0 0 5 0 0 3 8 6 1 6 6 0 3 1 0 6 6 6";
-	protossOpeningBook[ScoutRush]		    = "0 0 0 0 1 7 0 0 0 1 2 7 0 0 0 2 3 7 0 0 0 5 30 9 1 0 1 0 1 0 0 0 0 0 0 0 12 17 17 17 17 17 17 27 30 13 19 33 31 18 18 18 18 18 18 32 34 32 31 30 31 32 20";
+	//protossOpeningBook[ScoutRush]		    = "0 0 0 0 1 7 0 0 0 1 2 7 0 0 0 2 3 7 0 0 0 5 30 9 1 0 1 0 1 0 0 0 0 0 0 0 12 17 17 17 17 17 17 27 30 13 19 33 31 18 18 18 18 18 18 32 34 32 31 30 31 32 20";
+	protossOpeningBook[ScoutRush]		    = "0 0 0 0 1 7 0 0 0 1 2 7 0 0 0 2 3 7 0 0 0 5 9 1 0 1 0 1 0 0 0 0 0 0 0 12 17 17 17 17 17 17 27 13 19 18 18 18 18 18 18 20";
 	terranOpeningBook[TerranMarineRush]		= "0 0 0 0 0 1 0 0 3 0 0 3 0 1 0 4 0 0 0 6";
 	zergOpeningBook[ZergZerglingRush]		= "0 0 0 0 0 1 0 0 0 2 3 5 0 0 0 0 0 0 1 6";
 
@@ -396,6 +397,10 @@ const MetaPairVector StrategyManager::getBuildOrderGoal()
 		{
 			return getProtossDragoonsBuildOrderGoal();
 		}
+		else if (getCurrentStrategy() == ScoutRush)
+		{
+			return getProtossScoutRushBuildOrderGoal();
+		}
 
 		// if something goes wrong, use zealot goal
 		return getProtossZealotRushBuildOrderGoal();
@@ -616,6 +621,16 @@ const MetaPairVector StrategyManager::getProtossZealotRushBuildOrderGoal() const
 	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot,	zealotsWanted));
 	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Gateway,	gatewayWanted));
 	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Probe,	std::min(90, probesWanted)));
+
+	return goal;
+}
+
+const MetaPairVector StrategyManager::getProtossScoutRushBuildOrderGoal() const {
+	// the goal to return
+	MetaPairVector goal;
+	int numScouts =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Scout);
+	int probesWanted = numScouts + 10;
+	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Scout,	std::min(30, probesWanted)));
 
 	return goal;
 }

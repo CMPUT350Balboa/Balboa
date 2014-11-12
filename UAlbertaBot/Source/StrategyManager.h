@@ -56,6 +56,9 @@ class StrategyManager
 	const	std::string			getProtossDragoonsOpeningBook() const;
 	const	MetaPairVector		getProtossDragoonsBuildOrderGoal() const;
 
+	//scout rush strategy 
+	const	MetaPairVector		getProtossScoutRushBuildOrderGoal() const;
+
 	const	MetaPairVector		getTerranBuildOrderGoal() const;
 	const	MetaPairVector		getZergBuildOrderGoal() const;
 

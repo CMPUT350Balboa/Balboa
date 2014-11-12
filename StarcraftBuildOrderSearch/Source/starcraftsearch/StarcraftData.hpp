@@ -82,11 +82,11 @@ class StarcraftData {
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Protoss_Fleet_Beacon, actions.size()));				// 27
 			actions.push_back(StarcraftAction(BWAPI::UnitTypes::Protoss_Carrier, actions.size()));
 			actions.push_back(StarcraftAction(BWAPI::UpgradeTypes::Leg_Enhancements, actions.size()));
-			actions.push_back(StarcraftAction(BWAPI::UpgradeTypes::Protoss_Air_Armor, actions.size()));				// 30
+		/*	actions.push_back(StarcraftAction(BWAPI::UpgradeTypes::Protoss_Air_Armor, actions.size()));				// 30
 			actions.push_back(StarcraftAction(BWAPI::UpgradeTypes::Protoss_Air_Weapons, actions.size()));			// 31
 			actions.push_back(StarcraftAction(BWAPI::UpgradeTypes::Protoss_Plasma_Shields, actions.size()));		// 32
 			actions.push_back(StarcraftAction(BWAPI::UpgradeTypes::Apial_Sensors, actions.size()));					// 33
-			actions.push_back(StarcraftAction(BWAPI::UpgradeTypes::Gravitic_Thrusters, actions.size()));			// 34
+			actions.push_back(StarcraftAction(BWAPI::UpgradeTypes::Gravitic_Thrusters, actions.size()));			// 34*/
 		}
 		else if (r == BWAPI::Races::Terran)
 		{
