@@ -109,7 +109,7 @@
       <GenerateMapFile>true</GenerateMapFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy Release\UAlbertaBot.dll C:\StarCraft\bwapi-data\AI /y</Command>
+      <Command>copy Release\UAlbertaBot.dll D:\Game\StarCraft\bwapi-data\AI /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
