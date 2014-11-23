@@ -318,6 +318,10 @@ const bool StrategyManager::doAttack(const std::set<BWAPI::Unit *> & freeUnits)
 
 	int numUnitsNeededForAttack = 1;
 
+	//attack only when a strong enough force has been produced
+	if(currentStrategy == ProtossScoutRush){
+		numUnitsNeededForAttack = 15;
+	}
 	bool doAttack  = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Dark_Templar) >= 1
 					|| ourForceSize >= numUnitsNeededForAttack;
 
