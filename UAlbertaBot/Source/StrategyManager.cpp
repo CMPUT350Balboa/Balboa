@@ -147,6 +147,23 @@ void StrategyManager::writeResults()
 
 void StrategyManager::setStrategy()
 {
+    //hardcoded list of opponents that suck against UAlbertaBot's Zealot Rush
+	std::string enemyId(BWAPI::Broodwar->enemy()->getName());
+	if(enemyId.compare("NUSBot") == 0 ||
+	   enemyId.compare("Nova") == 0  ||
+	   enemyId.compare("HITA") == 0  ||
+	   enemyId.compare("CruzBot") == 0 ||
+	   enemyId.compare("Bonjwa") == 0 ||
+	   enemyId.compare("Oritaka") == 0 ||
+	   enemyId.compare("Yarmouk") == 0 ||
+	   enemyId.compare("MaasCraft") == 0 ||
+	   enemyId.compare("Xelnaga") == 0 ||
+	   enemyId.compare("TerranUAB") == 0) 
+	{
+		currentStrategy = ProtossZealotRush;   
+		return;
+	}
+
 	// if we are using file io to determine strategy, do so
 	if (Options::Modules::USING_STRATEGY_IO)
 	{
