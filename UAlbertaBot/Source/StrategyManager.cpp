@@ -34,7 +34,9 @@ void StrategyManager::addStrategies()
 	terranOpeningBook[TerranMarineRush]		= "0 0 0 0 0 1 0 0 3 0 0 3 0 1 0 4 0 0 0 6";
 	zergOpeningBook[ZergZerglingRush]		= "0 0 0 0 0 1 0 0 0 2 3 5 0 0 0 0 0 0 1 6";
 
-	protossOpeningBook[ProtossCannonRush] = "0 0 0 0 1 1 9";
+	//protossOpeningBook[ProtossCannonRush] =	"0 0 0 0 1 0 0 9 10 0 3 4 4 0 10 7 5 0 6 6 1 0 0 10 4 4 0 21"; //@@
+	protossOpeningBook[ProtossCannonRush] =	"0 0 0 1 0 3 0 0 3 0 4 4 4 4 0 1 0 7 5 8 6 4 4 6 4 4 6 4 4 6 4 4 6 4 4 6"; //@@
+
 
 	if (selfRace == BWAPI::Races::Protoss)
 	{
@@ -45,6 +47,7 @@ void StrategyManager::addStrategies()
 			usableStrategies.push_back(ProtossZealotRush);
 			usableStrategies.push_back(ProtossDarkTemplar);
 			usableStrategies.push_back(ProtossDragoons);
+			usableStrategies.push_back(ProtossCannonRush); //@@
 		}
 		else if (enemyRace == BWAPI::Races::Terran)
 		{
@@ -193,7 +196,7 @@ void StrategyManager::setStrategy()
         }
         else
         {
-            currentStrategy = ProtossZealotRush;
+            currentStrategy = ProtossCannonRush; //@@
         }
 	}
 
