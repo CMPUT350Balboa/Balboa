@@ -47,6 +47,7 @@ class StrategyManager
 	const	bool				expandProtossZealotRush() const;
 	const	std::string			getProtossZealotRushOpeningBook() const;
 	const	MetaPairVector		getProtossZealotRushBuildOrderGoal() const;
+	const	MetaPairVector		getProtossCannonRushBuildOrderGoal() const; //@@
 
 	const	bool				expandProtossDarkTemplar() const;
 	const	std::string			getProtossDarkTemplarOpeningBook() const;

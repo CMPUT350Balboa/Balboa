@@ -8,14 +8,16 @@ ScoutManager::ScoutManager() : workerScout(NULL), numWorkerScouts(0), scoutUnder
 
 void ScoutManager::update(const std::set<BWAPI::Unit *> & scoutUnits)
 {
-	if (scoutUnits.size() == 1)
+	if (scoutUnits.size() == 0) //@@
 	{
 		BWAPI::Unit * scoutUnit = *scoutUnits.begin();
+		BWAPI::Broodwar->printf("Hit Inside scout manager\n");//@@
 
 		if (scoutUnit->getType().isWorker())
 		{
 			if (scoutUnit != workerScout)
 			{
+				BWAPI::Broodwar->printf("-- scout manager\n");//@@
 				numWorkerScouts++;
 				workerScout = scoutUnit;
 			}

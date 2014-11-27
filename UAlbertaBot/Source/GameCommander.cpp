@@ -131,7 +131,7 @@ void GameCommander::setScoutUnits()
 		BWAPI::Unit * supplyProvider = getFirstSupplyProvider();
 
 		// if it exists
-		if (supplyProvider)
+		if (supplyProvider) 
 		{
 			// grab the closest worker to the supply provider to send to scout
 			BWAPI::Unit * workerScout = getClosestWorkerToTarget(supplyProvider->getPosition());
