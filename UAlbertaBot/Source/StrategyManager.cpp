@@ -36,7 +36,8 @@ void StrategyManager::addStrategies()
 
 	//protossOpeningBook[ProtossCannonRush] =	"0 0 0 0 1 0 0 9 10 0 3 4 4 0 10 7 5 0 6 6 1 0 0 10 4 4 0 21"; //@@
 	//protossOpeningBook[ProtossCannonRush] =	"0 0 0 1 0 3 0 0 3 0 4 4 4 4 0 1 0 7 5 8 6 4 4 6 4 4 6 4 4 6 4 4 6 4 4 6"; //@@
-	protossOpeningBook[ProtossCannonRush] =	"0 0 0 0"; //@@
+	protossOpeningBook[ProtossCannonRush] =	"9 10 10 10 10"; //@@
+	//protossOpeningBook[Protoss
 
 	if (selfRace == BWAPI::Races::Protoss)
 	{
@@ -166,6 +167,7 @@ void StrategyManager::setStrategy()
 			if (sum == 0)
 			{
 				currentStrategy = usableStrategies[strategyIndex];
+				lastStrategy = currentStrategy; //@@
 				return;
 			}
 		}
@@ -196,9 +198,11 @@ void StrategyManager::setStrategy()
         }
         else
         {
-            currentStrategy = ProtossCannonRush; //@@
+            //currentStrategy = ProtossCannonRush; 
+			currentStrategy = ProtossZealotRush; //@@
         }
 	}
+	lastStrategy = currentStrategy; //@@
 
 }
 
@@ -387,6 +391,7 @@ const MetaPairVector StrategyManager::getBuildOrderGoal()
 {
 	if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Protoss)
 	{
+		
 		if (getCurrentStrategy() == ProtossZealotRush)
 		{
 			return getProtossZealotRushBuildOrderGoal();
@@ -398,6 +403,10 @@ const MetaPairVector StrategyManager::getBuildOrderGoal()
 		else if (getCurrentStrategy() == ProtossDragoons)
 		{
 			return getProtossDragoonsBuildOrderGoal();
+		}
+		else if (getCurrentStrategy() == ProtossCannonRush)
+		{
+			return getProtossCannonRushBuildOrderGoal();
 		}
 
 		// if something goes wrong, use zealot goal
@@ -571,54 +580,12 @@ const MetaPairVector StrategyManager::getProtossCannonRushBuildOrderGoal() const
 	int gatewayWanted = 3;
 	int probesWanted = numProbes + 4;
 
-	if (InformationManager::Instance().enemyHasCloakedUnits())
-	{
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Robotics_Facility, 1));
-		
-		if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Robotics_Facility) > 0)
-		{
-			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Observatory, 1));
-		}
-		if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Observatory) > 0)
-		{
-			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Observer, 1));
-		}
-	}
+	
 
-	if (numNexusAll >= 2 || BWAPI::Broodwar->getFrameCount() > 9000)
-	{
-		gatewayWanted = 6;
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Assimilator, 1));
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Cybernetics_Core, 1));
-	}
-
-	if (numCyber > 0)
-	{
-		dragoonsWanted = numDragoons + 2;
-		goal.push_back(MetaPair(BWAPI::UpgradeTypes::Singularity_Charge, 1));
-	}
-
-	if (numNexusCompleted >= 3)
-	{
-		gatewayWanted = 8;
-		dragoonsWanted = numDragoons + 6;
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Observer, 1));
-	}
-
-	if (numNexusAll > 1)
-	{
-		probesWanted = numProbes + 6;
-	}
-
-	if (expandProtossZealotRush())
-	{
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Nexus, numNexusAll + 1));
-	}
-
-	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dragoon,	dragoonsWanted));
-	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot,	zealotsWanted));
-	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Gateway,	gatewayWanted));
-	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Probe,	std::min(90, probesWanted)));
+	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Photon_Cannon, 10));
+	//goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot,	zealotsWanted));
+	//goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Gateway,	gatewayWanted));
+	//goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Probe,	std::min(90, probesWanted)));
 
 	return goal;
 }
@@ -733,4 +700,24 @@ const MetaPairVector StrategyManager::getZergBuildOrderGoal() const
  const int StrategyManager::getCurrentStrategy()
  {
 	 return currentStrategy;
+ }
+
+  const int StrategyManager::getLastStrategy() //@@
+ {
+	 return lastStrategy;
+ }
+  void StrategyManager::setCurrentStrategy(int new_strategy) //@@
+ {
+	 BWAPI::Broodwar->printf("Last Strategy %d, current strategy %d, new_strategy %d", lastStrategy, currentStrategy, new_strategy);
+	 //BWAPI::Broodwar->printf("										Changing to strategy %d", new_strategy);
+	 //lastStrategy = currentStrategy;
+	 currentStrategy = new_strategy;
+ }
+
+    void StrategyManager::setLastStrategy(int current_strategy) //@@
+ {
+	 //BWAPI::Broodwar->printf("Last Strategy %d, current strategy %d, new_strategy %d", lastStrategy, currentStrategy, new_strategy);
+	 //BWAPI::Broodwar->printf("										Changing to strategy %d", new_strategy);
+	 //lastStrategy = currentStrategy;
+	 lastStrategy = current_strategy;
  }

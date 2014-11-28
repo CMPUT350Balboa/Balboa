@@ -646,6 +646,12 @@ int WorkerManager::getNumGasWorkers()
 	return workerData.getNumGasWorkers();
 }
 
+//@@
+int WorkerManager::getNumWorkers()
+{
+	return workerData.getNumWorkers();
+}
+
 
 WorkerManager & WorkerManager::Instance() {
 

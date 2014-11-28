@@ -57,6 +57,20 @@ void ProductionManager::update()
 	// check the queue for stuff we can build
 	manageBuildOrderQueue();
 
+	//@@ Information manager has changed strategy on the fly
+	//BWAPI::Broodwar->printf("					Current %d, Last %d",StrategyManager::Instance().getCurrentStrategy(), StrategyManager::Instance().getLastStrategy());
+	//BWAPI::Broodwar->printf("Last Strategy %d, current strategy %d, new_strategy %d", lastStrategy, currentStrategy, new_strategy);
+	if (StrategyManager::Instance().getCurrentStrategy() != StrategyManager::Instance().getLastStrategy()) //@@
+	{
+		BWAPI::Broodwar->printf("					Current %d, Last %d",StrategyManager::Instance().getCurrentStrategy(), StrategyManager::Instance().getLastStrategy());
+		BWAPI::Broodwar->printf("***********************************************Info Manager changed strategy!!");
+		//const std::vector< std::pair<MetaType, UnitCountType> > newGoal = StrategyManager::Instance().getBuildOrderGoal();
+		//perform BuildOrderSearch(newGoal);
+		queue.clearAll();
+		StrategyManager::Instance().setLastStrategy(StrategyManager::Instance().getCurrentStrategy());
+		BWAPI::Broodwar->printf("					Current %d, Last %d",StrategyManager::Instance().getCurrentStrategy(), StrategyManager::Instance().getLastStrategy());	
+	}
+
 	if (Options::Modules::USING_BUILD_LEARNER)
 	{
 		if (queue.size() == 0)

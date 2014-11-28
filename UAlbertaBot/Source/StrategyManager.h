@@ -29,6 +29,7 @@ class StrategyManager
 	std::vector<IntPair>		results;
 	std::vector<int>			usableStrategies;
 	int							currentStrategy;
+	int							lastStrategy;
 
 	BWAPI::Race					selfRace;
 	BWAPI::Race					enemyRace;
@@ -81,6 +82,9 @@ public:
 	const	bool				rushDetected();
 
 	const	int					getCurrentStrategy();
+	const	int					getLastStrategy(); //@@
+			void				setCurrentStrategy(int new_strategy); //@@
+			void				setLastStrategy(int current_strategy); //@@
 
 	const	MetaPairVector		getBuildOrderGoal();
 	const	std::string			getOpeningBook() const;
