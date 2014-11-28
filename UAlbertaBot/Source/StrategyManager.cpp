@@ -219,7 +219,7 @@ void StrategyManager::setStrategy()
         }
         else
         {
-            currentStrategy = ProtossScoutRush;
+            currentStrategy = ProtossZealotRush;
         }
 	}
 
