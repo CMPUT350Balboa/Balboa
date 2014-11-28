@@ -5,6 +5,7 @@
 #include "micromanagement/RangedManager.h"
 #include "micromanagement/DetectorManager.h"
 #include "micromanagement/TransportManager.h"
+#include "micromanagement/ProtossScoutManager.h"
 #include "SquadOrder.h"
 #include "DistanceMap.hpp"
 #include "StrategyManager.h"
@@ -14,6 +15,7 @@ class ZealotManager;
 class DarkTemplarManager;
 class DragoonManager;
 class ObserverManager;
+class ProtossScoutManager;
 
 class MeleeManager;
 class RangedManager;
@@ -31,6 +33,7 @@ class Squad
 	RangedManager		rangedManager;
 	DetectorManager		detectorManager;
 	TransportManager	transportManager;
+	ProtossScoutManager pScoutManager;
 
 	std::map<BWAPI::Unit *, bool>	nearEnemy;
 
