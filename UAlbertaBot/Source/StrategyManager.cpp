@@ -31,6 +31,8 @@ void StrategyManager::addStrategies()
 	//protossOpeningBook[ProtossDarkTemplar]	= "0 0 0 0 1 3 0 7 5 0 0 12 3 13 0 22 22 22 22 0 1 0";
     protossOpeningBook[ProtossDarkTemplar]	=     "0 0 0 0 1 0 3 0 7 0 5 0 12 0 13 3 22 22 1 22 22 0 1 0";
 	protossOpeningBook[ProtossDragoons]		= "0 0 0 0 1 0 0 3 0 7 0 0 5 0 0 3 8 6 1 6 6 0 3 1 0 6 6 6";
+
+	protossOpeningBook[ProtossScoutRush]    = "0 0 0 0 1 7 0 0 0 1 2 0 0 0 7 0 0 0 3 1 5 9 1 12 17 17 17 18 18 18 18 18 18 18";
 	protossOpeningBook[ProtossCannonDefendAndZealotRush]= "0 0 0 0 1 9 10 10 3 3 0 0 4 1 4 4 0 4 4 0 1 4 3 0 1 0 4 0 4 4 4 4 1 0 4 4 4";
 	terranOpeningBook[TerranMarineRush]		= "0 0 0 0 0 1 0 0 3 0 0 3 0 1 0 4 0 0 0 6";
 	zergOpeningBook[ZergZerglingRush]		= "0 0 0 0 0 1 0 0 0 2 3 5 0 0 0 0 0 0 1 6";
@@ -44,6 +46,7 @@ void StrategyManager::addStrategies()
 			usableStrategies.push_back(ProtossZealotRush);
 			usableStrategies.push_back(ProtossDarkTemplar);
 			usableStrategies.push_back(ProtossDragoons);
+			usableStrategies.push_back(ProtossScoutRush); //testing new strat when PvP
 		}
 		else if (enemyRace == BWAPI::Races::Terran)
 		{
@@ -216,7 +219,7 @@ void StrategyManager::setStrategy()
         }
         else
         {
-            currentStrategy = ProtossZealotRush;
+            currentStrategy = ProtossScoutRush;
         }
 	}
 
@@ -340,6 +343,10 @@ const bool StrategyManager::doAttack(const std::set<BWAPI::Unit *> & freeUnits)
 
 	int numUnitsNeededForAttack = 1;
 
+	//attack only when a strong enough force has been produced
+	if(currentStrategy == ProtossScoutRush){
+		numUnitsNeededForAttack = 15;
+	}
 	bool doAttack  = BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Dark_Templar) >= 1
 					|| ourForceSize >= numUnitsNeededForAttack;
 
@@ -418,6 +425,10 @@ const MetaPairVector StrategyManager::getBuildOrderGoal()
 		else if (getCurrentStrategy() == ProtossDragoons)
 		{
 			return getProtossDragoonsBuildOrderGoal();
+		}
+		else if (getCurrentStrategy() == ProtossScoutRush)
+		{
+			return getProtossScoutRushBuildOrderGoal();
 		}
 		else if (getCurrentStrategy() == ProtossCannonDefendAndZealotRush)
 		{
@@ -643,6 +654,16 @@ const MetaPairVector StrategyManager::getProtossZealotRushBuildOrderGoal() const
 	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot,	zealotsWanted));
 	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Gateway,	gatewayWanted));
 	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Probe,	std::min(90, probesWanted)));
+
+	return goal;
+}
+
+const MetaPairVector StrategyManager::getProtossScoutRushBuildOrderGoal() const {
+	// the goal to return
+	MetaPairVector goal;
+	int numScouts =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Scout);
+	int scoutsWanted = numScouts + 10;
+	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Scout,	std::min(30, scoutsWanted)));
 
 	return goal;
 }
