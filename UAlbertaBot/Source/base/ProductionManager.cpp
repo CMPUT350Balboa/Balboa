@@ -62,13 +62,12 @@ void ProductionManager::update()
 	//BWAPI::Broodwar->printf("Last Strategy %d, current strategy %d, new_strategy %d", lastStrategy, currentStrategy, new_strategy);
 	if (StrategyManager::Instance().getCurrentStrategy() != StrategyManager::Instance().getLastStrategy()) //@@
 	{
-		BWAPI::Broodwar->printf("					Current %d, Last %d",StrategyManager::Instance().getCurrentStrategy(), StrategyManager::Instance().getLastStrategy());
-		BWAPI::Broodwar->printf("***********************************************Info Manager changed strategy!!");
-		//const std::vector< std::pair<MetaType, UnitCountType> > newGoal = StrategyManager::Instance().getBuildOrderGoal();
-		//perform BuildOrderSearch(newGoal);
+		BWAPI::Broodwar->printf("								Current %d, Last %d",StrategyManager::Instance().getCurrentStrategy(), StrategyManager::Instance().getLastStrategy());
+		BWAPI::Broodwar->printf("								*****Strategy has changed");
+		const std::vector< std::pair<MetaType, UnitCountType> > newGoal = StrategyManager::Instance().getBuildOrderGoal();
+		performBuildOrderSearch(newGoal);
 		queue.clearAll();
 		StrategyManager::Instance().setLastStrategy(StrategyManager::Instance().getCurrentStrategy());
-		BWAPI::Broodwar->printf("					Current %d, Last %d",StrategyManager::Instance().getCurrentStrategy(), StrategyManager::Instance().getLastStrategy());	
 	}
 
 	if (Options::Modules::USING_BUILD_LEARNER)
