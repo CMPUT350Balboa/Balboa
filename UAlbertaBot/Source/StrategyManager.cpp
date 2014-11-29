@@ -1,6 +1,19 @@
 #include "Common.h"
 #include "StrategyManager.h"
 
+const std::string StrategyManager::PROTOSS_ZEALOT_RUSH = "PROTOSS_ZEALOT_RUSH";
+const std::string StrategyManager::PROTOSS_DARK_TEMPLAR = "PROTOSS_DARK_TEMPLAR";
+const std::string StrategyManager::PROTOSS_DRAGOONS = "PROTOSS_DRAGOONS";
+
+//Terran Strategies
+
+const std::string StrategyManager::TERRAN_MARINE_RUSH = "TERRAN_MARINE_RUSH";
+
+//Zerg Strategies
+
+const std::string StrategyManager::ZERG_ZERGLING_RUSH = "ZERG_ZERGLING_RUSH";
+
+
 // constructor
 StrategyManager::StrategyManager() 
 	: firstAttackSent(false)
@@ -21,56 +34,28 @@ StrategyManager & StrategyManager::Instance()
 
 void StrategyManager::addStrategies() 
 {
-	protossOpeningBook = std::vector<std::string>(NumProtossStrategies);
-	terranOpeningBook  = std::vector<std::string>(NumTerranStrategies);
-	zergOpeningBook    = std::vector<std::string>(NumZergStrategies);
 
-	//protossOpeningBook[ProtossZealotRush]	= "0 0 0 0 1 0 0 3 0 0 3 0 1 3 0 4 4 4 4 4 1 0 4 4 4";
-    protossOpeningBook[ProtossZealotRush]	= "0 0 0 0 1 0 3 3 0 0 4 1 4 4 0 4 4 0 1 4 3 0 1 0 4 0 4 4 4 4 1 0 4 4 4";
-	//protossOpeningBook[ProtossZealotRush]	= "0";
-	//protossOpeningBook[ProtossDarkTemplar]	= "0 0 0 0 1 3 0 7 5 0 0 12 3 13 0 22 22 22 22 0 1 0";
-    protossOpeningBook[ProtossDarkTemplar]	=     "0 0 0 0 1 0 3 0 7 0 5 0 12 0 13 3 22 22 1 22 22 0 1 0";
-	protossOpeningBook[ProtossDragoons]		= "0 0 0 0 1 0 0 3 0 7 0 0 5 0 0 3 8 6 1 6 6 0 3 1 0 6 6 6";
-	terranOpeningBook[TerranMarineRush]		= "0 0 0 0 0 1 0 0 3 0 0 3 0 1 0 4 0 0 0 6";
-	zergOpeningBook[ZergZerglingRush]		= "0 0 0 0 0 1 0 0 0 2 3 5 0 0 0 0 0 0 1 6";
+	strategies[PROTOSS_ZEALOT_RUSH] = "0 0 0 0 1 0 3 3 0 0 4 1 4 4 0 4 4 0 1 4 3 0 1 0 4 0 4 4 4 4 1 0 4 4 4";
+	strategies[PROTOSS_DARK_TEMPLAR] = "0 0 0 0 1 0 3 0 7 0 5 0 12 0 13 3 22 22 1 22 22 0 1 0";
+	strategies[PROTOSS_DRAGOONS] = "0 0 0 0 1 0 0 3 0 7 0 0 5 0 0 3 8 6 1 6 6 0 3 1 0 6 6 6";
+
+	strategies[TERRAN_MARINE_RUSH] = "0 0 0 0 0 1 0 0 3 0 0 3 0 1 0 4 0 0 0 6";
+
+	strategies[ZERG_ZERGLING_RUSH] = "0 0 0 0 0 1 0 0 0 2 3 5 0 0 0 0 0 0 1 6";
 
 	if (selfRace == BWAPI::Races::Protoss)
 	{
-		results = std::vector<IntPair>(NumProtossStrategies);
-
-		if (enemyRace == BWAPI::Races::Protoss)
-		{
-			usableStrategies.push_back(ProtossZealotRush);
-			usableStrategies.push_back(ProtossDarkTemplar);
-			usableStrategies.push_back(ProtossDragoons);
-		}
-		else if (enemyRace == BWAPI::Races::Terran)
-		{
-			usableStrategies.push_back(ProtossZealotRush);
-			usableStrategies.push_back(ProtossDarkTemplar);
-			usableStrategies.push_back(ProtossDragoons);
-		}
-		else if (enemyRace == BWAPI::Races::Zerg)
-		{
-			usableStrategies.push_back(ProtossZealotRush);
-			usableStrategies.push_back(ProtossDragoons);
-		}
-		else
-		{
-			BWAPI::Broodwar->printf("Enemy Race Unknown");
-			usableStrategies.push_back(ProtossZealotRush);
-			usableStrategies.push_back(ProtossDragoons);
-		}
+		usableStrategies.push_back(PROTOSS_DARK_TEMPLAR);
+		usableStrategies.push_back(PROTOSS_DRAGOONS);
+		usableStrategies.push_back(PROTOSS_ZEALOT_RUSH);
 	}
 	else if (selfRace == BWAPI::Races::Terran)
 	{
-		results = std::vector<IntPair>(NumTerranStrategies);
-		usableStrategies.push_back(TerranMarineRush);
+		usableStrategies.push_back(TERRAN_MARINE_RUSH);
 	}
 	else if (selfRace == BWAPI::Races::Zerg)
 	{
-		results = std::vector<IntPair>(NumZergStrategies);
-		usableStrategies.push_back(ZergZerglingRush);
+		usableStrategies.push_back(ZERG_ZERGLING_RUSH);
 	}
 
 	if (Options::Modules::USING_STRATEGY_IO)
@@ -101,46 +86,44 @@ void StrategyManager::readResults()
 	// the file corresponding to the enemy's previous results
 	std::string readFile = readDir + BWAPI::Broodwar->enemy()->getName() + ".txt";
 
-	// if the file doesn't exist, set the results to zeros
-	if (stat(readFile.c_str(), &buf) == -1)
-	{
-		std::fill(results.begin(), results.end(), IntPair(0,0));
-	}
-	// otherwise read in the results
-	else
+
+	// if the file exists read it in
+	if(stat(readFile.c_str(), &buf) != -1)
 	{
 		std::ifstream f_in(readFile.c_str());
 		std::string line;
-		getline(f_in, line);
-		results[ProtossZealotRush].first = atoi(line.c_str());
-		getline(f_in, line);
-		results[ProtossZealotRush].second = atoi(line.c_str());
-		getline(f_in, line);
-		results[ProtossDarkTemplar].first = atoi(line.c_str());
-		getline(f_in, line);
-		results[ProtossDarkTemplar].second = atoi(line.c_str());
-		getline(f_in, line);
-		results[ProtossDragoons].first = atoi(line.c_str());
-		getline(f_in, line);
-		results[ProtossDragoons].second = atoi(line.c_str());
+
+		while(getline(f_in, line)) {
+			std::stringstream stream(line);
+			
+			int wins;
+			int losses;
+
+			std::string name;
+			
+			stream >> name;
+			stream >> wins;
+			stream >> losses;
+
+			results[name] = std::pair<int, int>(wins, losses);
+		}
+
 		f_in.close();
 	}
-
-	BWAPI::Broodwar->printf("Results (%s): (%d %d) (%d %d) (%d %d)", BWAPI::Broodwar->enemy()->getName().c_str(), 
-		results[0].first, results[0].second, results[1].first, results[1].second, results[2].first, results[2].second);
 }
 
+
+//Iterates through our map of results and prints them as ID WINS LOSSES\n
 void StrategyManager::writeResults()
 {
 	std::string writeFile = writeDir + BWAPI::Broodwar->enemy()->getName() + ".txt";
 	std::ofstream f_out(writeFile.c_str());
 
-	f_out << results[ProtossZealotRush].first   << "\n";
-	f_out << results[ProtossZealotRush].second  << "\n";
-	f_out << results[ProtossDarkTemplar].first  << "\n";
-	f_out << results[ProtossDarkTemplar].second << "\n";
-	f_out << results[ProtossDragoons].first     << "\n";
-	f_out << results[ProtossDragoons].second    << "\n";
+	std::map<std::string, std::pair<int, int> >::iterator iter;
+
+    for (iter = results.begin(); iter != results.end(); ++iter) {
+		f_out << iter->first << " " << iter->second.first << " " << iter->second.second << "\n";
+	}	
 
 	f_out.close();
 }
@@ -151,50 +134,36 @@ void StrategyManager::setStrategy()
 	if (Options::Modules::USING_STRATEGY_IO)
 	{
 		double bestUCB = -1;
-		int bestStrategyIndex = 0;
+		std::string bestStrategyName;
+
+		std::vector<std::string>::iterator usableIter;
 
 		// UCB requires us to try everything once before using the formula
-		for (size_t strategyIndex(0); strategyIndex<usableStrategies.size(); ++strategyIndex)
+		for (usableIter = usableStrategies.begin(); usableIter != usableStrategies.end(); ++usableIter) 
 		{
-			int sum = results[usableStrategies[strategyIndex]].first + results[usableStrategies[strategyIndex]].second;
-
-			if (sum == 0)
+			if (results.find(*usableIter) == results.end())
 			{
-				currentStrategy = usableStrategies[strategyIndex];
+				currentStrategy = *usableIter;
 				return;
 			}
 		}
 
 		// if we have tried everything once, set the maximizing ucb value
-		for (size_t strategyIndex(0); strategyIndex<usableStrategies.size(); ++strategyIndex)
+		std::map<std::string, std::pair<int, int> >::iterator resultsIter;
+
+		for (resultsIter = results.begin(); resultsIter != results.end(); ++resultsIter) 
 		{
-			double ucb = getUCBValue(usableStrategies[strategyIndex]);
+			double ucb = getUCBValue(resultsIter->first);
 
 			if (ucb > bestUCB)
 			{
 				bestUCB = ucb;
-				bestStrategyIndex = strategyIndex;
+				bestStrategyName = resultsIter->first;
 			}
 		}
 		
-		currentStrategy = usableStrategies[bestStrategyIndex];
+		currentStrategy = bestStrategyName;
 	}
-	else
-	{
-		// otherwise return a random strategy
-
-        std::string enemyName(BWAPI::Broodwar->enemy()->getName());
-        
-        if (enemyName.compare("Skynet") == 0)
-        {
-            currentStrategy = ProtossDarkTemplar;
-        }
-        else
-        {
-            currentStrategy = ProtossZealotRush;
-        }
-	}
-
 }
 
 void StrategyManager::onEnd(const bool isWinner)
@@ -231,12 +200,15 @@ void StrategyManager::onEnd(const bool isWinner)
 	}
 }
 
-const double StrategyManager::getUCBValue(const size_t & strategy) const
+const double StrategyManager::getUCBValue(const std::string strategy) const
 {
 	double totalTrials(0);
-	for (size_t s(0); s<usableStrategies.size(); ++s)
+
+	std::map<std::string, std::pair<int, int> >::iterator resultsIter;
+
+	for (resultsIter = results.begin(); resultsIter != results.end(); ++resultsIter) 
 	{
-		totalTrials += results[usableStrategies[s]].first + results[usableStrategies[s]].second;
+		totalTrials += resultsIter->second.first + resultsIter->second.second;
 	}
 
 	double C		= 0.7;
@@ -255,21 +227,7 @@ const int StrategyManager::getScore(BWAPI::Player * player) const
 
 const std::string StrategyManager::getOpeningBook() const
 {
-	if (selfRace == BWAPI::Races::Protoss)
-	{
-		return protossOpeningBook[currentStrategy];
-	}
-	else if (selfRace == BWAPI::Races::Terran)
-	{
-		return terranOpeningBook[currentStrategy];
-	}
-	else if (selfRace == BWAPI::Races::Zerg)
-	{
-		return zergOpeningBook[currentStrategy];
-	} 
-
-	// something wrong, return the protoss one
-	return protossOpeningBook[currentStrategy];
+	return strategies[currentStrategy];
 }
 
 // when do we want to defend with our workers?
@@ -382,15 +340,15 @@ const MetaPairVector StrategyManager::getBuildOrderGoal()
 {
 	if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Protoss)
 	{
-		if (getCurrentStrategy() == ProtossZealotRush)
+		if (getCurrentStrategy() == PROTOSS_ZEALOT_RUSH)
 		{
 			return getProtossZealotRushBuildOrderGoal();
 		}
-		else if (getCurrentStrategy() == ProtossDarkTemplar)
+		else if (getCurrentStrategy() == PROTOSS_DARK_TEMPLAR)
 		{
 			return getProtossDarkTemplarBuildOrderGoal();
 		}
-		else if (getCurrentStrategy() == ProtossDragoons)
+		else if (getCurrentStrategy() == PROTOSS_DRAGOONS)
 		{
 			return getProtossDragoonsBuildOrderGoal();
 		}
@@ -655,7 +613,7 @@ const MetaPairVector StrategyManager::getZergBuildOrderGoal() const
 	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
 }
 
- const int StrategyManager::getCurrentStrategy()
+ const std::string StrategyManager::getCurrentStrategy()
  {
 	 return currentStrategy;
  }
