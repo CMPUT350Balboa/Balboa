@@ -28,34 +28,14 @@ void StrategyManager::addStrategies()
 	//protossOpeningBook[ProtossZealotRush]	= "0 0 0 0 1 0 0 3 0 0 3 0 1 3 0 4 4 4 4 4 1 0 4 4 4";
     protossOpeningBook[ProtossZealotRush]	= "0 0 0 0 1 0 3 3 0 0 4 1 4 4 0 4 4 0 1 4 3 0 1 0 4 0 4 4 4 4 1 0 4 4 4";
 	//protossOpeningBook[ProtossZealotRush]	= "0";
-	//protossOpeningBook[ProtossDarkTemplar]	= "0 0 0 0 1 3 0 7 5 0 0 12 3 13 0 22 22 22 22 0 1 0";
-    protossOpeningBook[ProtossDarkTemplar]	=     "0 0 0 0 1 0 3 0 7 0 5 0 12 0 13 3 22 22 1 22 22 0 1 0";
+	//protossOpeningBook[ProtossDarkTemplar]= "0 0 0 0 1 3 0 7 5 0 0 12 3 13 0 22 22 22 22 0 1 0";
+    protossOpeningBook[ProtossDarkTemplar]	= "0 0 0 0 1 0 3 0 7 0 5 0 12 0 13 3 22 22 1 22 22 0 1 0";
 	protossOpeningBook[ProtossDragoons]		= "0 0 0 0 1 0 0 3 0 7 0 0 5 0 0 3 8 6 1 6 6 0 3 1 0 6 6 6";
 	terranOpeningBook[TerranMarineRush]		= "0 0 0 0 0 1 0 0 3 0 0 3 0 1 0 4 0 0 0 6";
 	zergOpeningBook[ZergZerglingRush]		= "0 0 0 0 0 1 0 0 0 2 3 5 0 0 0 0 0 0 1 6";
 	
-	protossOpeningBook[ProtossCannonRush] =	"7"; //@@ temp value
-	
-	protossOpeningBook[Protoss1012Gateway] = "0 0 0 0 1 0 0 3 0 0 3 0 4 0 0 0 1 4 4"; //@@ build order not implemented yet
-
-	//Protoss1012Gateway - zealot rush/counter
-	/*
-	8 - Pylon[1]
-	10 - Gateway
-	10 - Probe
-	11 - Probe
-	12 - Gateway
-	12 - Probe
-	13 - Zealot
-	15 - Probe
-	16 - Pylon
-	2 more Zealots[2]
-	Nexus at Natural Expansion or Backdoor Expansion
-	Assimilator
-	Cybernetics Core
-	1.  Probe is being used to scout
-	2.  Zealots block the Choke Point / Ramp
-	*/
+	//protossOpeningBook[ProtossCannonRush] =	"7"; //@@ temp value	
+	//protossOpeningBook[Protoss1012Gateway] =  "0 0 0 0 1 0 0 3 0 0 3 0 4 0 0 0 1 4 4"; //@@ build order removed
 
 	if (selfRace == BWAPI::Races::Protoss)
 	{
@@ -66,7 +46,7 @@ void StrategyManager::addStrategies()
 			usableStrategies.push_back(ProtossZealotRush);
 			usableStrategies.push_back(ProtossDarkTemplar);
 			usableStrategies.push_back(ProtossDragoons);
-			usableStrategies.push_back(ProtossCannonRush); //@@
+			//usableStrategies.push_back(ProtossCannonRush); //@@ removed for now
 		}
 		else if (enemyRace == BWAPI::Races::Terran)
 		{
@@ -216,11 +196,10 @@ void StrategyManager::setStrategy()
         }
         else
         {
-            //currentStrategy = ProtossCannonRush; 
-			currentStrategy = ProtossZealotRush; //@@
+			currentStrategy = ProtossZealotRush;
         }
 	}
-	lastStrategy = currentStrategy; //@@
+	lastStrategy = currentStrategy; //@@ tracks previous strategy for DynamicStrategyManager
 
 }
 
@@ -422,10 +401,7 @@ const MetaPairVector StrategyManager::getBuildOrderGoal()
 		{
 			return getProtossDragoonsBuildOrderGoal();
 		}
-		else if (getCurrentStrategy() == ProtossCannonRush)
-		{
-			return getProtossCannonRushBuildOrderGoal();
-		}
+		
 
 		// if something goes wrong, use zealot goal
 		return getProtossZealotRushBuildOrderGoal();
@@ -455,6 +431,23 @@ const MetaPairVector StrategyManager::getProtossDragoonsBuildOrderGoal() const
 	int dragoonsWanted = numDragoons > 0 ? numDragoons + 6 : 2;
 	int gatewayWanted = 3;
 	int probesWanted = numProbes + 6;
+
+	// @@Additions for dynamic strategy switches to ensure key opening book elements are complete
+	if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Assimilator))
+	{
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Assimilator, 1));
+	}
+	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Assimilator) >0)
+	{
+		if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core))
+			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Cybernetics_Core, 1));
+	}
+	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core) >0)
+	{
+		if (!BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge))
+			goal.push_back(MetaPair(BWAPI::UpgradeTypes::Singularity_Charge, 1));
+	}
+
 
 	if (InformationManager::Instance().enemyHasCloakedUnits())
 	{
@@ -529,6 +522,28 @@ const MetaPairVector StrategyManager::getProtossDarkTemplarBuildOrderGoal() cons
 	int gatewayWanted = 3;
 	int probesWanted = numProbes + 6;
 
+	// @@Additions for dynamic strategy switches to ensure key opening book elements are complete
+	if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Assimilator))
+	{
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Assimilator, 1));
+	}
+	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Assimilator) >0)
+	{
+		if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core))
+			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Cybernetics_Core, 1));
+	}
+	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core) >0)
+	{
+		if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Citadel_of_Adun))
+			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Citadel_of_Adun, 1));
+	}
+	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Citadel_of_Adun) >0)
+	{
+		if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Templar_Archives))
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Templar_Archives, 1));
+	}
+
+	
 	if (InformationManager::Instance().enemyHasCloakedUnits())
 	{
 		
@@ -597,161 +612,78 @@ const MetaPairVector StrategyManager::getProtossZealotRushBuildOrderGoal() const
 	int dragoonsWanted = numDragoons;
 	int gatewayWanted = 3;
 	int probesWanted = numProbes + 4;
-
-	if (InformationManager::Instance().enemyHasCloakedUnits())
-	{
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Robotics_Facility, 1));
-		
-		if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Robotics_Facility) > 0)
-		{
-			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Observatory, 1));
-		}
-		if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Observatory) > 0)
-		{
-			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Observer, 1));
-		}
-	}
-
-	if (numNexusAll >= 2 || BWAPI::Broodwar->getFrameCount() > 9000)
-	{
-		gatewayWanted = 6;
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Assimilator, 1));
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Cybernetics_Core, 1));
-	}
-
-	if (numCyber > 0)
-	{
-		dragoonsWanted = numDragoons + 2;
-		goal.push_back(MetaPair(BWAPI::UpgradeTypes::Singularity_Charge, 1));
-	}
-
-	if (numNexusCompleted >= 3)
-	{
-		gatewayWanted = 8;
-		dragoonsWanted = numDragoons + 6;
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Observer, 1));
-	}
-
-	if (numNexusAll > 1)
-	{
-		probesWanted = numProbes + 6;
-	}
-
-	if (expandProtossZealotRush())
-	{
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Nexus, numNexusAll + 1));
-	}
-
-	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dragoon,	dragoonsWanted));
-	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot,	zealotsWanted));
-	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Gateway,	gatewayWanted));
-	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Probe,	std::min(90, probesWanted)));
-
-	return goal;
-}
-
-//@@ need to fill out the values, this is just a copy (see comments in opening book)
-const MetaPairVector StrategyManager::getProtoss1012GatewayBuildOrderGoal() const 
-{
-	// the goal to return
-	MetaPairVector goal;
-
-	int numZealots =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Zealot);
-	int numDragoons =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Dragoon);
-	int numProbes =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Probe);
-	int numNexusCompleted =		BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Nexus);
-	int numNexusAll =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Nexus);
-	int numCyber =				BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core);
-	int numCannon =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Photon_Cannon);
-
-	int zealotsWanted = numZealots + 8;
-	int dragoonsWanted = numDragoons;
-	int gatewayWanted = 3;
-	int probesWanted = numProbes + 4;
-
-	if (InformationManager::Instance().enemyHasCloakedUnits())
-	{
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Robotics_Facility, 1));
-		
-		if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Robotics_Facility) > 0)
-		{
-			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Observatory, 1));
-		}
-		if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Observatory) > 0)
-		{
-			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Observer, 1));
-		}
-	}
-
-	if (numNexusAll >= 2 || BWAPI::Broodwar->getFrameCount() > 9000)
-	{
-		gatewayWanted = 6;
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Assimilator, 1));
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Cybernetics_Core, 1));
-	}
-
-	if (numCyber > 0)
-	{
-		dragoonsWanted = numDragoons + 2;
-		goal.push_back(MetaPair(BWAPI::UpgradeTypes::Singularity_Charge, 1));
-	}
-
-	if (numNexusCompleted >= 3)
-	{
-		gatewayWanted = 8;
-		dragoonsWanted = numDragoons + 6;
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Observer, 1));
-	}
-
-	if (numNexusAll > 1)
-	{
-		probesWanted = numProbes + 6;
-	}
-
-	if (expandProtossZealotRush())
-	{
-		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Nexus, numNexusAll + 1));
-	}
-
-	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dragoon,	dragoonsWanted));
-	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot,	zealotsWanted));
-	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Gateway,	gatewayWanted));
-	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Probe,	std::min(90, probesWanted)));
-
-	return goal;
-}
-
-//@@ Testing on the fly strategy switching
-const MetaPairVector StrategyManager::getProtossCannonRushBuildOrderGoal() const
-{
-	// the goal to return
-	MetaPairVector goal;
-
-	int numZealots =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Zealot);
-	int numDragoons =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Dragoon);
-	int numProbes =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Probe);
-	int numNexusCompleted =		BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Nexus);
-	int numNexusAll =			BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Nexus);
-	int numCyber =				BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core);
-	int numCannon =				BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Photon_Cannon);
-
-	int zealotsWanted = numZealots + 8;
-	int dragoonsWanted = numDragoons;
-	int gatewayWanted = 3;
-	int probesWanted = numProbes + 4;
-
 	
-	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Photon_Cannon) < 2) {
-	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Photon_Cannon, 1));
+	//Already covered by gatewayWanted above
+	//@@Additions for dynamic strategy switches to ensure key opening book elements are complete
+	//if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Gateway) < 2)
+	//{
+	//	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Gateway, 1));
+	//}
+	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Assimilator) >0)
+	{
+		if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core))
+			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Cybernetics_Core, 1));
 	}
-	else {
+	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core) >0)
+	{
+		if (!BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge))
+			goal.push_back(MetaPair(BWAPI::UpgradeTypes::Singularity_Charge, 1));
+	}
+
+
+
+	if (InformationManager::Instance().enemyHasCloakedUnits())
+	{
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Robotics_Facility, 1));
+		
+		if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Robotics_Facility) > 0)
+		{
+			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Observatory, 1));
+		}
+		if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Observatory) > 0)
+		{
+			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Observer, 1));
+		}
+	}
+
+	if (numNexusAll >= 2 || BWAPI::Broodwar->getFrameCount() > 9000)
+	{
+		gatewayWanted = 6;
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Assimilator, 1));
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Cybernetics_Core, 1));
+	}
+
+	if (numCyber > 0)
+	{
+		dragoonsWanted = numDragoons + 2;
+		goal.push_back(MetaPair(BWAPI::UpgradeTypes::Singularity_Charge, 1));
+	}
+
+	if (numNexusCompleted >= 3)
+	{
+		gatewayWanted = 8;
+		dragoonsWanted = numDragoons + 6;
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Observer, 1));
+	}
+
+	if (numNexusAll > 1)
+	{
+		probesWanted = numProbes + 6;
+	}
+
+	if (expandProtossZealotRush())
+	{
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Nexus, numNexusAll + 1));
+	}
+
+	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Dragoon,	dragoonsWanted));
 	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Zealot,	zealotsWanted));
 	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Gateway,	gatewayWanted));
 	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Probe,	std::min(90, probesWanted)));
-	}
 
 	return goal;
 }
+
 
 const MetaPairVector StrategyManager::getTerranBuildOrderGoal() const
 {

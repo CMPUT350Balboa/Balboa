@@ -165,7 +165,7 @@
     <ClCompile Include="..\Source\Visualizer.cpp">
       <Filter>extra</Filter>
     </ClCompile>
-    <ClCompile Include="..\DynamicStrategyManager.cpp">
+    <ClCompile Include="..\Source\DynamicStrategyManager.cpp">
       <Filter>game\util\info</Filter>
     </ClCompile>
   </ItemGroup>
@@ -299,7 +299,7 @@
     <ClInclude Include="..\Source\Visualizer.h">
       <Filter>extra</Filter>
     </ClInclude>
-    <ClInclude Include="..\DynamicStrategyManager.h">
+    <ClInclude Include="..\Source\DynamicStrategyManager.h">
       <Filter>game\util\info</Filter>
     </ClInclude>
   </ItemGroup>

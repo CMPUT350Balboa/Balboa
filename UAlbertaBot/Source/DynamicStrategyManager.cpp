@@ -1,17 +1,23 @@
-#include "DynamicStrategyManager.h"
 #include "Common.h"
 #include "InformationManager.h"
 #include "StrategyManager.h" //@@
-//#include "ProductionManager.h"
+#include "DynamicStrategyManager.h"
 
-DynamicStrategyManager::DynamicStrategyManager(void)
+// This is a new class written by Michael Williams
+// Enemy strategy detection and counter strategy switching
+//
+// See also code in ProductionManager that performs the new build order search
+
+DynamicStrategyManager::DynamicStrategyManager()
 {
 }
 
 
-DynamicStrategyManager::~DynamicStrategyManager(void)
-{
-}
+//DynamicStrategyManager::~DynamicStrategyManager()
+//{
+//}
+
+void DynamicStrategyManager::onStart() {}
 
 // get an instance of this
 DynamicStrategyManager & DynamicStrategyManager::Instance() 
@@ -23,87 +29,111 @@ DynamicStrategyManager & DynamicStrategyManager::Instance()
 void DynamicStrategyManager::update() 
 {
 
-
-	//@@ all me from here down to other indication
-	//enemyUnitData.getUnits.getNumUnits(); //@@
-	//player == BWAPI::Broodwar->self()
-	if (BWAPI::Broodwar->getFrameCount() > 100 && BWAPI::Broodwar->getFrameCount() < 150){ //@@
-		BWAPI::Broodwar->printf("								<< ENHANCED STRATEGY MANAGER >>");
+	if (BWAPI::Broodwar->getFrameCount() == 10){ //@@
+		BWAPI::Broodwar->printf("								<< DYNAMIC STRATEGY MANAGER ACTIVE >>");
 	}
 
-	//UnitType unit = 
-	//enemyUnitData.getNumUnits(UnitType::getUnitType("Protoss_Probe"));
-	//enemyUnitData.getNumUnits(
-
-		/*
-		const UnitInfo & ui(iter->second);
-		BWAPI::UnitType type = ui.type;
-		int num_units = enemyUnitData.getNumUnits(type);
-	*/
-
-	enemyUnitData = InformationManager::Instance().getUnitDetail(BWAPI::Broodwar->self());
+	searchNewStrategy(); // error in externals of function, fix
 	
-	// Map of < Unit type, count of that type >
-	std::map<BWAPI::UnitType, int>		unitTypeCount;
+}
 
-	//@@ for all enemy units detected, we can see what types they are and how many there are, to choose a change to the strategy
-	FOR_EACH_UIMAP_CONST(iter, enemyUnitData.getUnits())
+
+//void DynamicStrategyManager::findEnemyStrategy(std::map<BWAPI::UnitType, int>  unitTypeCountMap)
+void DynamicStrategyManager::searchNewStrategy()
+{
+
+	enemyUnitData = InformationManager::Instance().getUnitDetail(BWAPI::Broodwar->enemy()); //@@ my function in info manager
+	
+	// Create the unit type and count map
+	//std::map<BWAPI::UnitType, int>		selfTypeCountMap;
+	//std::map<BWAPI::UnitType, int>		enemyTypeCountMap;
+	//selfTypeCountMap = getUnitTypeCountMap(enemyUnitData);
+	enemyTypeCountMap.clear();
+	enemyTypeCountMap = getUnitTypeCountMap(enemyUnitData);
+
+	int strategy =-1;
+	int zealot = 0;
+	int dragoon = 0;
+	int dark_templar = 0;
+
+	BWAPI::Race enemyRace = BWAPI::Broodwar->enemy()->getRace();
+
+	if (enemyRace == BWAPI::Races::Protoss){
+
+		zealot += (enemyTypeCountMap[BWAPI::UnitTypes::Protoss_Gateway] > 1); 
+
+		dragoon += (enemyTypeCountMap[BWAPI::UnitTypes::Protoss_Assimilator] > 0);
+		dragoon += (enemyTypeCountMap[BWAPI::UnitTypes::Protoss_Cybernetics_Core] > 0); 
+		dragoon += (BWAPI::Broodwar->enemy()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge) > 0);
+		//dragoon += (enemyTypeCountMap[BWAPI::UnitTypes::Protoss_Dragoon] > 0);
+
+		dark_templar += (enemyTypeCountMap[BWAPI::UnitTypes::Protoss_Assimilator] > 0);
+		dark_templar += (enemyTypeCountMap[BWAPI::UnitTypes::Protoss_Cybernetics_Core] > 0); 
+		dark_templar += (enemyTypeCountMap[BWAPI::UnitTypes::Protoss_Citadel_of_Adun] > 0); 
+		dark_templar += (enemyTypeCountMap[BWAPI::UnitTypes::Protoss_Dark_Templar] > 0);
+		
+		if (zealot) {strategy = ProtossZealotRush;}						// give weight to zealot rush, as opponent has two gateways
+		if (dark_templar || dragoon)									// enemy building higher tech so:
+		{									
+			if (dark_templar > dragoon) {strategy = ProtossDragoons;}	// focus on Dragoons to counter Dark Templar
+			else {strategy = ProtossZealotRush;}						// focus on Zealot rush to counter Dragoons
+		}
+
+
+
+		//if we have completed full tech tree for strategy, don't switch to a new strategy
+		if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Citadel_of_Adun) > 0) {strategy = ProtossDarkTemplar;}
+		if (BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge) > 0) {strategy = ProtossDragoons;}
+		
+		if (Options::Debug::DRAW_UALBERTABOT_DEBUG)
+		{
+			BWAPI::Broodwar->drawTextScreen(140, 300, "\x04<<< BEST COUNTER STRATEGY: %d >>>", strategy);
+			BWAPI::Broodwar->drawTextScreen(140, 220, "\x07 zealot %d", zealot);
+			BWAPI::Broodwar->drawTextScreen(140, 230, "\x07 dragoon %d", dragoon);
+			BWAPI::Broodwar->drawTextScreen(140, 240, "\x07 DT %d", dark_templar);
+			BWAPI::Broodwar->drawTextScreen(140, 250, "\x07 guess_strategy %d", strategy);
+			BWAPI::Broodwar->drawTextScreen(140, 260, "\x07 my_strategy %d", StrategyManager::Instance().getCurrentStrategy());
+			BWAPI::Broodwar->drawTextScreen(140, 270, "\x07 number_switches %d", numSwitches);
+		}
+		
+		
+		//std::stringstream log;
+		//log << "zealot, " << zealot << "dragoon ," << dragoon << "DT ," <<  dark_templar << "guess_strategy ," << strategy << "my_strategy \n" << StrategyManager::Instance().getCurrentStrategy();
+		//Logger::Instance().log(log.str());
+		
+		if (StrategyManager::Instance().getCurrentStrategy() != strategy && strategy > -1)
+		{
+			StrategyManager::Instance().setCurrentStrategy(strategy);
+			++numSwitches;			
+		}
+	
+	}
+	
+	if (enemyRace == BWAPI::Races::Terran){
+	}
+
+	if (enemyRace == BWAPI::Races::Zerg){
+	}
+
+
+}
+
+std::map<BWAPI::UnitType, int> DynamicStrategyManager::getUnitTypeCountMap(UnitData raceUnitData)
+{
+	
+	//@@ Unit type and count map
+	//Hash map key is unit type: unitTypeCount.count(BWAPI::UnitTypes::Protoss_Probe) is zero if there are none of that type
+	//Hash map value is count of that unit type: unitTypeCount[BWAPI::UnitTypes::Protoss_Probe]
+	//Here we are testing whether the enemy has any of that type (is there a key)
+	std::map<BWAPI::UnitType, int> unitCount;
+
+	FOR_EACH_UIMAP_CONST(iter, raceUnitData.getUnits())
 	{
-		const UnitInfo & ui(iter->second);
-		BWAPI::UnitType type = ui.type;
-		unitTypeCount[type]++;
+		const UnitInfo & unitInfo(iter->second);
+		BWAPI::UnitType type = unitInfo.type;
+		unitCount[type]++;
 
 	}
 
-		//Hash map key is unit type: unitTypeCount.count(BWAPI::UnitTypes::Protoss_Probe)
-		//Hash map value is count of that unit type: unitTypeCount[BWAPI::UnitTypes::Protoss_Probe]
-		//Here we are testing whether the enemy has any of that type (is there a key)
-		
-		/* initial test code
-		if (unitTypeCount.count(BWAPI::UnitTypes::Protoss_Probe) && unitTypeCount[BWAPI::UnitTypes::Protoss_Probe] >6)
-		{
-			//preliminary test showing that this works
-			StrategyManager::Instance().setCurrentStrategy(3);
-			
-		}
-		*/
-
-		//if (type = BWAPI::UnitTypes::Protoss_Probe && num_units > 6)
-		if (unitTypeCount.count(BWAPI::UnitTypes::Protoss_Gateway) && unitTypeCount[BWAPI::UnitTypes::Protoss_Gateway] > 1)
-		{
-			BWAPI::Broodwar->printf("Enemy strategy is probably Two Gateway Zealot Rush");
-			//Counter with the same strategy
-			//safest is 10/12 Gateway
-			StrategyManager::Instance().setCurrentStrategy(3);
-			
-		}
-
-		/*
-		if (type = BWAPI::UnitTypes::Protoss_Dragoon){
-			//could be dragoon build or dark templar
-		
-		}
-
-		if (type = BWAPI::UnitTypes::Protoss_Dark_Templar){
-			//dark templar rush
-
-		}
-
-
-		if (type = BWAPI::UnitTypes::Protoss_Zealot){
-			//zealot rush
-			//@FIND A WAY TO USE THIS LINE:
-			//StrategyManager::Instance().setCurrentStrategy
-
-		}
-
-		if (type = BWAPI::UnitTypes::Protoss_Dark_Templar){
-			//dark templar rush
-
-		}
-		
-
-	}
-	*///@@ end here
-
+	return unitCount;
 }

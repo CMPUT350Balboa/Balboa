@@ -8,7 +8,7 @@
 Logger::Logger() 
 {
 	//logFile = "C:\\Users\\Dave\\Desktop\\UalbertaBot_log.txt";
-    logFile = "D:\\Game\\StarCraft\\bwapi-data\\AI\\UalbertaBot_log.txt"; //@@
+    //logFile = "D:\\Game\\StarCraft\\bwapi-data\\AI\\UalbertaBot_log.txt"; //@@
 	logStream.open(logFile.c_str(), std::ofstream::app);
 }
 

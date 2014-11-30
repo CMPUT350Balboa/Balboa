@@ -57,17 +57,24 @@ void ProductionManager::update()
 	// check the queue for stuff we can build
 	manageBuildOrderQueue();
 
-	//@@ Information manager has changed strategy on the fly
+	
+	//@@ This code block creates new build order gooal
+	// when DynamicStrategyManager has changed strategy on the fly
 	if (StrategyManager::Instance().getCurrentStrategy() != StrategyManager::Instance().getLastStrategy()) //@@
 	{
-		BWAPI::Broodwar->printf("								*****************Current %d, Last %d",StrategyManager::Instance().getCurrentStrategy(), StrategyManager::Instance().getLastStrategy());
-		BWAPI::Broodwar->printf("								*****************Info Manager changed strategy!!");
-		const std::vector< std::pair<MetaType, UnitCountType> > newGoal = StrategyManager::Instance().getBuildOrderGoal();
+		BWAPI::Broodwar->drawTextScreen(140, 280, "\x04 Strategy has changed to %d", StrategyManager::Instance().getCurrentStrategy());
+		//std::stringstream log;
+		//log << "Entered into Prod Manager, currentStrategy() " << StrategyManager::Instance().getCurrentStrategy() << ", Last Strategy() " << StrategyManager::Instance().getLastStrategy() << "\n";
+		//Logger::Instance().log(log.str());
+
 		queue.clearAll();
+		const std::vector< std::pair<MetaType, UnitCountType> > newGoal = StrategyManager::Instance().getBuildOrderGoal();		
 		performBuildOrderSearch(newGoal);		
-		StrategyManager::Instance().setLastStrategy(StrategyManager::Instance().getCurrentStrategy());
-		
+		StrategyManager::Instance().setLastStrategy(StrategyManager::Instance().getCurrentStrategy());		
 	}
+	//@@
+	
+	BWAPI::Broodwar->drawTextScreen(140, 200, "\x04Queue Size: %d", queue.size());
 
 	if (Options::Modules::USING_BUILD_LEARNER)
 	{
