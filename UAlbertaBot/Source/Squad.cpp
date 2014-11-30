@@ -181,6 +181,12 @@ bool Squad::needsToRegroup()
 		return false;
 	}
 
+	if((StrategyManager::Instance().getCurrentStrategy() ==  StrategyManager::ProtossScoutRush) && units.size() > 20){
+		return false;
+	}
+	if((StrategyManager::Instance().getCurrentStrategy() ==  StrategyManager::ProtossDragoonDefend) && units.size() > 15){
+		return false;
+	}
 	CombatSimulation sim;
 	sim.setCombatUnits(unitClosest->getPosition(), Options::Micro::COMBAT_REGROUP_RADIUS + InformationManager::Instance().lastFrameRegroup*300);
 	ScoreType score = sim.simulateCombat();

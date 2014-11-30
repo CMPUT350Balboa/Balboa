@@ -58,6 +58,7 @@ class StrategyManager
 
 	//scout rush strategy 
 	const	MetaPairVector		getProtossScoutRushBuildOrderGoal() const;
+	const   MetaPairVector		getProtossDragoonsDefendBuildOrderGoal() const;
 
 	const	MetaPairVector		getTerranBuildOrderGoal() const;
 	const	MetaPairVector		getZergBuildOrderGoal() const;
@@ -68,7 +69,7 @@ class StrategyManager
 
 public:
 
-	enum { ProtossZealotRush=0, ProtossDarkTemplar=1, ProtossDragoons=2, ProtossCannonDefendAndZealotRush = 3, ProtossScoutRush = 4, NumProtossStrategies=5 };
+	enum { ProtossZealotRush=0, ProtossDarkTemplar=1, ProtossDragoons=2, ProtossCannonDefendAndZealotRush = 3, ProtossScoutRush = 4, ProtossDragoonDefend = 5, NumProtossStrategies= 6 };
 	enum { TerranMarineRush=0, NumTerranStrategies=1 };
 	enum { ZergZerglingRush=0, NumZergStrategies=1 };
 
