@@ -88,6 +88,8 @@ public:
 	void						drawUnitInformation(int x, int y);
 
 	SparCraft::Map *			getMap() { return &map; }
+
+	const UnitData &			getUnitDetail(BWAPI::Player * player) const;//@@
 };
 
 

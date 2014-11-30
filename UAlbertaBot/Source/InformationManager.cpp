@@ -27,73 +27,8 @@ void InformationManager::update()
 	updateBaseLocationInfo();
 	map.setUnitData(BWAPI::Broodwar);
 	map.setBuildingData(BWAPI::Broodwar);
-
-	//enemyUnitData.getUnits.getNumUnits(); //@@
-	//player == BWAPI::Broodwar->self()
-	if (BWAPI::Broodwar->getFrameCount() > 100 && BWAPI::Broodwar->getFrameCount() < 150){ //@@
-		BWAPI::Broodwar->printf(" Switch Build Order Goal !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-	}
-
-	//UnitType unit = 
-	//enemyUnitData.getNumUnits(UnitType::getUnitType("Protoss_Probe"));
-	//enemyUnitData.getNumUnits(
-	
-	std::map<BWAPI::UnitType, int>		unitTypeCount;
-
-	//@@ for all enemy units detected, we can see what types they are and how many there are, to choose a change to the strategy
-	FOR_EACH_UIMAP_CONST(iter, enemyUnitData.getUnits())
-	{
-		const UnitInfo & ui(iter->second);
-		BWAPI::UnitType type = ui.type;
-		unitTypeCount[type]++;
-
-	}
-
-	/*
-		const UnitInfo & ui(iter->second);
-		BWAPI::UnitType type = ui.type;
-		int num_units = enemyUnitData.getNumUnits(type);
-	*/
-		int new_orders = 0;
-		
-		//if (type = BWAPI::UnitTypes::Protoss_Probe && num_units > 6)
-		if (unitTypeCount.count(BWAPI::UnitTypes::Protoss_Probe) && unitTypeCount[BWAPI::UnitTypes::Protoss_Probe] >6)
-		{
-			//preliminary test showing that this works
-			//BWAPI::Broodwar->printf("					ENEMY HAS 7 probes");
-			StrategyManager::Instance().setCurrentStrategy(3);
-			
-		}
-
-		/*
-		if (type = BWAPI::UnitTypes::Protoss_Dragoon){
-			//could be dragoon build or dark templar
-		
-		}
-
-		if (type = BWAPI::UnitTypes::Protoss_Dark_Templar){
-			//dark templar rush
-
-		}
-
-
-		if (type = BWAPI::UnitTypes::Protoss_Zealot){
-			//zealot rush
-			//@FIND A WAY TO USE THIS LINE:
-			//StrategyManager::Instance().setCurrentStrategy
-
-		}
-
-		if (type = BWAPI::UnitTypes::Protoss_Dark_Templar){
-			//dark templar rush
-
-		}
-		
-
-	}
-	*/
-
 }
+
 
 void InformationManager::updateUnitInfo() 
 {
@@ -502,6 +437,11 @@ const UnitData & InformationManager::getUnitData(BWAPI::Player * player) const
 const UnitData & InformationManager::getUnitData(BWAPI::Unit * unit) const
 {
 	return getUnitData(unit->getPlayer());
+}
+
+const UnitData & InformationManager::getUnitDetail(BWAPI::Player * player) const //@@ I needed a public version of this method
+{
+	return (player == BWAPI::Broodwar->self()) ? selfUnitData : enemyUnitData;
 }
 
 bool InformationManager::enemyHasCloakedUnits()

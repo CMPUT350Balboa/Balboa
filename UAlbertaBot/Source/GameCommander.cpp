@@ -2,6 +2,7 @@
 #include "GameCommander.h"
 
 
+
 GameCommander::GameCommander() : numWorkerScouts(0), currentScout(NULL)
 {
 
@@ -41,8 +42,12 @@ void GameCommander::update()
 		scoutManager.update(scoutUnits);
 	}
 	timerManager.stopTimer(TimerManager::Scout);
-
+	
 	// utility managers
+	timerManager.startTimer(TimerManager::DynamicStrategyManager); //@@
+	DynamicStrategyManager::Instance().update();	//@@
+	timerManager.stopTimer(TimerManager::DynamicStrategyManager); //@@
+
 	timerManager.startTimer(TimerManager::InformationManager);
 	InformationManager::Instance().update();
 	timerManager.stopTimer(TimerManager::InformationManager);
