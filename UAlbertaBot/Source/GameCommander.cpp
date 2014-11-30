@@ -2,6 +2,7 @@
 #include "GameCommander.h"
 
 
+
 GameCommander::GameCommander() : numWorkerScouts(0), currentScout(NULL)
 {
 
@@ -41,8 +42,12 @@ void GameCommander::update()
 		scoutManager.update(scoutUnits);
 	}
 	timerManager.stopTimer(TimerManager::Scout);
-
+	
 	// utility managers
+	timerManager.startTimer(TimerManager::DynamicStrategyManager); //@@
+	DynamicStrategyManager::Instance().update();	//@@
+	timerManager.stopTimer(TimerManager::DynamicStrategyManager); //@@
+
 	timerManager.startTimer(TimerManager::InformationManager);
 	InformationManager::Instance().update();
 	timerManager.stopTimer(TimerManager::InformationManager);
@@ -124,17 +129,24 @@ void GameCommander::setValidUnits()
 // TODO: take this worker away from worker manager in a clever way
 void GameCommander::setScoutUnits()
 {
+		
 	// if we have just built our first suply provider, set the worker to a scout
-	if (numWorkerScouts == 0)
+	if (numWorkerScouts == 0 ) 
 	{
 		// get the first supply provider we come across in our units, this should be the first one we make
 		BWAPI::Unit * supplyProvider = getFirstSupplyProvider();
 
 		// if it exists
-		if (supplyProvider)
+		if (supplyProvider || WorkerManager::Instance().getNumWorkers() == 8) //@@
 		{
+
+			BWAPI::Broodwar->printf("%d Workers, SENDING SCOUT", WorkerManager::Instance().getNumWorkers()); //@@
 			// grab the closest worker to the supply provider to send to scout
-			BWAPI::Unit * workerScout = getClosestWorkerToTarget(supplyProvider->getPosition());
+			//BWAPI::Unit * workerScout = getClosestWorkerToTarget(supplyProvider->getPosition());
+			
+			//BWAPI::Position homeTile = BWAPI::Broodwar->self()->getStartLocation();
+			BWAPI::Position myBasePosition(BWAPI::Broodwar->self()->getStartLocation());//@@
+			BWAPI::Unit * workerScout = getClosestWorkerToTarget(myBasePosition);//@@
 
 			// if we find a worker (which we should) add it to the scout vector
 			if (workerScout)

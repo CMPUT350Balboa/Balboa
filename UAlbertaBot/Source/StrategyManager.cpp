@@ -27,8 +27,10 @@ void StrategyManager::addStrategies()
 
 	//protossOpeningBook[ProtossZealotRush]	= "0 0 0 0 1 0 0 3 0 0 3 0 1 3 0 4 4 4 4 4 1 0 4 4 4";
     protossOpeningBook[ProtossZealotRush]	= "0 0 0 0 1 0 3 3 0 0 4 1 4 4 0 4 4 0 1 4 3 0 1 0 4 0 4 4 4 4 1 0 4 4 4";
+
 	//protossOpeningBook[ProtossDarkTemplar]	= "0 0 0 0 1 3 0 7 5 0 0 12 3 13 0 22 22 22 22 0 1 0";
     protossOpeningBook[ProtossDarkTemplar]	=     "0 0 0 0 1 0 3 0 7 0 5 0 12 0 13 3 22 22 1 22 22 0 1 0";
+
 	protossOpeningBook[ProtossDragoons]		= "0 0 0 0 1 0 0 3 0 7 0 0 5 0 0 3 8 6 1 6 6 0 3 1 0 6 6 6";
 	protossOpeningBook[ProtossDragoonDefend] = "0 0 0 0 1 0 3 0 7 0 5 0 12 0 13 3 22 22 1 22 22 0 1 0 22";
 	//protossOpeningBook[ProtossScoutRush]    = "0 0 0 0 1 7 0 0 0 1 2 0 0 0 7 0 0 0 3 1 5 9 1 12 17 17 17 18 18 18 18 18 18 18";
@@ -36,6 +38,9 @@ void StrategyManager::addStrategies()
 	protossOpeningBook[ProtossCannonDefendAndZealotRush]= "0 0 0 0 1 9 10 10 3 3 0 0 4 1 4 4 0 4 4 0 1 4 3 0 1 0 4 0 4 4 4 4 1 0 4 4 4";
 	terranOpeningBook[TerranMarineRush]		= "0 0 0 0 0 1 0 0 3 0 0 3 0 1 0 4 0 0 0 6";
 	zergOpeningBook[ZergZerglingRush]		= "0 0 0 0 0 1 0 0 0 2 3 5 0 0 0 0 0 0 1 6";
+	
+	//protossOpeningBook[ProtossCannonRush] =	"7"; //@@ temp value	
+	//protossOpeningBook[Protoss1012Gateway] =  "0 0 0 0 1 0 0 3 0 0 3 0 4 0 0 0 1 4 4"; //@@ build order removed
 
 	if (selfRace == BWAPI::Races::Protoss)
 	{
@@ -47,6 +52,7 @@ void StrategyManager::addStrategies()
 			usableStrategies.push_back(ProtossDarkTemplar);
 			usableStrategies.push_back(ProtossDragoons);
 			usableStrategies.push_back(ProtossScoutRush); //testing new strat when PvP
+
 		}
 		else if (enemyRace == BWAPI::Races::Terran)
 		{
@@ -189,6 +195,7 @@ void StrategyManager::setStrategy()
 			if (sum == 0)
 			{
 				currentStrategy = usableStrategies[strategyIndex];
+				lastStrategy = currentStrategy; //@@
 				return;
 			}
 		}
@@ -219,9 +226,10 @@ void StrategyManager::setStrategy()
         }
         else
         {
-            currentStrategy = ProtossZealotRush;
+			currentStrategy = ProtossZealotRush;
         }
 	}
+	lastStrategy = currentStrategy; //@@ tracks previous strategy for DynamicStrategyManager
 
 }
 
@@ -419,6 +427,7 @@ const MetaPairVector StrategyManager::getBuildOrderGoal()
 {
 	if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Protoss)
 	{
+		
 		if (getCurrentStrategy() == ProtossZealotRush)
 		{
 			return getProtossZealotRushBuildOrderGoal();
@@ -443,6 +452,7 @@ const MetaPairVector StrategyManager::getBuildOrderGoal()
 		{
 			return getProtossDragoonsDefendBuildOrderGoal();
 		}
+
 
 		// if something goes wrong, use zealot goal
 		return getProtossZealotRushBuildOrderGoal();
@@ -472,6 +482,23 @@ const MetaPairVector StrategyManager::getProtossDragoonsBuildOrderGoal() const
 	int dragoonsWanted = numDragoons > 0 ? numDragoons + 6 : 2;
 	int gatewayWanted = 3;
 	int probesWanted = numProbes + 6;
+
+	// @@Additions for dynamic strategy switches to ensure key opening book elements are complete
+	if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Assimilator))
+	{
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Assimilator, 1));
+	}
+	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Assimilator) >0)
+	{
+		if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core))
+			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Cybernetics_Core, 1));
+	}
+	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core) >0)
+	{
+		if (!BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge))
+			goal.push_back(MetaPair(BWAPI::UpgradeTypes::Singularity_Charge, 1));
+	}
+
 
 	if (InformationManager::Instance().enemyHasCloakedUnits())
 	{
@@ -546,6 +573,28 @@ const MetaPairVector StrategyManager::getProtossDarkTemplarBuildOrderGoal() cons
 	int gatewayWanted = 3;
 	int probesWanted = numProbes + 6;
 
+	// @@Additions for dynamic strategy switches to ensure key opening book elements are complete
+	if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Assimilator))
+	{
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Assimilator, 1));
+	}
+	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Assimilator) >0)
+	{
+		if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core))
+			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Cybernetics_Core, 1));
+	}
+	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core) >0)
+	{
+		if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Citadel_of_Adun))
+			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Citadel_of_Adun, 1));
+	}
+	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Citadel_of_Adun) >0)
+	{
+		if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Templar_Archives))
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Templar_Archives, 1));
+	}
+
+	
 	if (InformationManager::Instance().enemyHasCloakedUnits())
 	{
 		
@@ -614,6 +663,25 @@ const MetaPairVector StrategyManager::getProtossZealotRushBuildOrderGoal() const
 	int dragoonsWanted = numDragoons;
 	int gatewayWanted = 3;
 	int probesWanted = numProbes + 4;
+	
+	//Already covered by gatewayWanted above
+	//@@Additions for dynamic strategy switches to ensure key opening book elements are complete
+	//if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Gateway) < 2)
+	//{
+	//	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Gateway, 1));
+	//}
+	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Assimilator) >0)
+	{
+		if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core))
+			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Cybernetics_Core, 1));
+	}
+	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core) >0)
+	{
+		if (!BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge))
+			goal.push_back(MetaPair(BWAPI::UpgradeTypes::Singularity_Charge, 1));
+	}
+
+
 
 	if (InformationManager::Instance().enemyHasCloakedUnits())
 	{
@@ -778,6 +846,7 @@ const MetaPairVector StrategyManager:: getProtossDragoonsDefendBuildOrderGoal() 
 
 }
 
+
 const MetaPairVector StrategyManager::getTerranBuildOrderGoal() const
 {
 	// the goal to return
@@ -818,4 +887,19 @@ const MetaPairVector StrategyManager::getZergBuildOrderGoal() const
  const int StrategyManager::getCurrentStrategy()
  {
 	 return currentStrategy;
+ }
+
+  const int StrategyManager::getLastStrategy() //@@
+ {
+	 return lastStrategy;
+ }
+  void StrategyManager::setCurrentStrategy(int new_strategy) //@@
+ {
+	 BWAPI::Broodwar->printf("Last Strategy %d, current strategy %d, new_strategy %d", lastStrategy, currentStrategy, new_strategy);
+	 currentStrategy = new_strategy;
+ }
+
+    void StrategyManager::setLastStrategy(int current_strategy) //@@
+ {
+	 lastStrategy = current_strategy;
  }

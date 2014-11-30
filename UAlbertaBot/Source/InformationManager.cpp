@@ -1,5 +1,6 @@
 #include "Common.h"
 #include "InformationManager.h"
+#include "StrategyManager.h" //@@
 
 #define SELF_INDEX 0
 #define ENEMY_INDEX 1
@@ -27,6 +28,7 @@ void InformationManager::update()
 	map.setUnitData(BWAPI::Broodwar);
 	map.setBuildingData(BWAPI::Broodwar);
 }
+
 
 void InformationManager::updateUnitInfo() 
 {
@@ -435,6 +437,11 @@ const UnitData & InformationManager::getUnitData(BWAPI::Player * player) const
 const UnitData & InformationManager::getUnitData(BWAPI::Unit * unit) const
 {
 	return getUnitData(unit->getPlayer());
+}
+
+const UnitData & InformationManager::getUnitDetail(BWAPI::Player * player) const //@@ I needed a public version of this method
+{
+	return (player == BWAPI::Broodwar->self()) ? selfUnitData : enemyUnitData;
 }
 
 bool InformationManager::enemyHasCloakedUnits()

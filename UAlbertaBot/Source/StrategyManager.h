@@ -29,6 +29,7 @@ class StrategyManager
 	std::vector<IntPair>		results;
 	std::vector<int>			usableStrategies;
 	int							currentStrategy;
+	int							lastStrategy;
 
 	BWAPI::Race					selfRace;
 	BWAPI::Race					enemyRace;
@@ -47,6 +48,7 @@ class StrategyManager
 	const	bool				expandProtossZealotRush() const;
 	const	std::string			getProtossZealotRushOpeningBook() const;
 	const	MetaPairVector		getProtossZealotRushBuildOrderGoal() const;
+	const	MetaPairVector		getProtossCannonRushBuildOrderGoal() const; //@@
 
 	const	bool				expandProtossDarkTemplar() const;
 	const	std::string			getProtossDarkTemplarOpeningBook() const;
@@ -60,6 +62,7 @@ class StrategyManager
 	const	MetaPairVector		getProtossScoutRushBuildOrderGoal() const;
 	const   MetaPairVector		getProtossDragoonsDefendBuildOrderGoal() const;
 
+
 	const	MetaPairVector		getTerranBuildOrderGoal() const;
 	const	MetaPairVector		getZergBuildOrderGoal() const;
 
@@ -70,6 +73,7 @@ class StrategyManager
 public:
 
 	enum { ProtossZealotRush=0, ProtossDarkTemplar=1, ProtossDragoons=2, ProtossCannonDefendAndZealotRush = 3, ProtossScoutRush = 4, ProtossDragoonDefend = 5, NumProtossStrategies= 6 };
+
 	enum { TerranMarineRush=0, NumTerranStrategies=1 };
 	enum { ZergZerglingRush=0, NumZergStrategies=1 };
 
@@ -83,6 +87,9 @@ public:
 	const	bool				rushDetected();
 
 	const	int					getCurrentStrategy();
+	const	int					getLastStrategy();						//@@ utilizes by DynamicStrategyManager
+			void				setCurrentStrategy(int new_strategy);	//@@
+			void				setLastStrategy(int current_strategy);	//@@
 
 	const	MetaPairVector		getBuildOrderGoal();
 	const	std::string			getOpeningBook() const;

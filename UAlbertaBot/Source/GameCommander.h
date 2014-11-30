@@ -9,6 +9,7 @@
 #include "base/BuildingManager.h"
 #include "ScoutManager.h"
 #include "StrategyManager.h"
+#include "DynamicStrategyManager.h"
 
 #include "..\..\StarcraftBuildOrderSearch\Source\starcraftsearch\Timer.hpp"
 
@@ -22,8 +23,9 @@ class TimerManager
 
 public:
 
-	enum Type { All, Worker, Production, Building, Combat, Scout, InformationManager, MapGrid, MapTools, Search, NumTypes };
-
+	//@@ added Dynamic type
+	enum Type { All, Worker, Production, Building, Combat, Scout, InformationManager, MapGrid, MapTools, Search, DynamicStrategyManager, NumTypes };
+	
 
 	TimerManager() : timers(std::vector<BuildOrderSearch::Timer>(NumTypes)), barWidth(40)
 	{
@@ -37,6 +39,8 @@ public:
 		timerNames.push_back("MapGrid");
 		timerNames.push_back("MapTools");
 		timerNames.push_back("Search");
+		timerNames.push_back("Dynamic"); //@@
+
 	}
 
 	~TimerManager() {}

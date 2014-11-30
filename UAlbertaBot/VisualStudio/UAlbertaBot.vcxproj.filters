@@ -168,6 +168,9 @@
     <ClCompile Include="..\Source\micromanagement\ProtossScoutManager.cpp">
       <Filter>game\combat\micro\generic</Filter>
     </ClCompile>
+	<ClCompile Include="..\Source\DynamicStrategyManager.cpp">
+      <Filter>game\util\info</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\CombatCommander.h">
@@ -301,6 +304,9 @@
     </ClInclude>
     <ClInclude Include="..\Source\micromanagement\ProtossScoutManager.h">
       <Filter>game\combat\micro\generic</Filter>
+    </ClInclude>
+	<ClInclude Include="..\Source\DynamicStrategyManager.h">
+      <Filter>game\util\info</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
