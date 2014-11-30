@@ -16,18 +16,21 @@ class DynamicStrategyManager
 {
 	DynamicStrategyManager();
 
-	UnitData							enemyUnitData;	
-	std::map<BWAPI::UnitType, int>  	getUnitTypeCountMap();
+	UnitData							enemyUnitData;
+	UnitData							selfUnitData;
+	std::map<BWAPI::UnitType, int>  	getUnitTypeCountMap(UnitData raceUnitData);
+	int									numSwitches;
+	std::map<BWAPI::UnitType, int>		enemyTypeCountMap;
 	
 
 public:
 	//DynamicStrategyManager();
 	//~DynamicStrategyManager();
-
+	enum { ProtossZealotRush=0, ProtossDarkTemplar=1, ProtossDragoons=2, ProtossCannonRush=3, Protoss1012Gateway, NumProtossStrategies=5 }; //@@change back
 	static DynamicStrategyManager &		Instance();
 	void								update();
 	void								onStart();
-	void								findEnemyStrategy(std::map<BWAPI::UnitType, int>  unitTypeCountMap);
+	void								searchNewStrategy();
 	
 };
 
