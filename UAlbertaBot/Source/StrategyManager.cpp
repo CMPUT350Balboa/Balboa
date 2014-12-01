@@ -17,12 +17,12 @@ const std::string StrategyManager::ZERG_ZERGLING_RUSH = "ZERG_ZERGLING_RUSH";
 // constructor
 StrategyManager::StrategyManager() 
 	: firstAttackSent(false)
-	, currentStrategy(0)
+	, currentStrategy("PROTOSS_ZEALOT_RUSH")
 	, selfRace(BWAPI::Broodwar->self()->getRace())
 	, enemyRace(BWAPI::Broodwar->enemy()->getRace())
 {
 	addStrategies();
-	setStrategy();
+	setStrategy();	
 }
 
 // get an instance of this
@@ -34,7 +34,6 @@ StrategyManager & StrategyManager::Instance()
 
 void StrategyManager::addStrategies() 
 {
-
 	strategies[PROTOSS_ZEALOT_RUSH] = "0 0 0 0 1 0 3 3 0 0 4 1 4 4 0 4 4 0 1 4 3 0 1 0 4 0 4 4 4 4 1 0 4 4 4";
 	strategies[PROTOSS_DARK_TEMPLAR] = "0 0 0 0 1 0 3 0 7 0 5 0 12 0 13 3 22 22 1 22 22 0 1 0";
 	strategies[PROTOSS_DRAGOONS] = "0 0 0 0 1 0 0 3 0 7 0 0 5 0 0 3 8 6 1 6 6 0 3 1 0 6 6 6";
@@ -112,18 +111,22 @@ void StrategyManager::readResults()
 	}
 }
 
-
 //Iterates through our map of results and prints them as ID WINS LOSSES\n
 void StrategyManager::writeResults()
 {
+
+
+
 	std::string writeFile = writeDir + BWAPI::Broodwar->enemy()->getName() + ".txt";
 	std::ofstream f_out(writeFile.c_str());
+
 
 	std::map<std::string, std::pair<int, int> >::iterator iter;
 
     for (iter = results.begin(); iter != results.end(); ++iter) {
 		f_out << iter->first << " " << iter->second.first << " " << iter->second.second << "\n";
 	}	
+
 
 	f_out.close();
 }
@@ -168,35 +171,41 @@ void StrategyManager::setStrategy()
 
 void StrategyManager::onEnd(const bool isWinner)
 {
+
+
+
 	// write the win/loss data to file if we're using IO
 	if (Options::Modules::USING_STRATEGY_IO)
 	{
+		bool win = false;
+
 		// if the game ended before the tournament time limit
 		if (BWAPI::Broodwar->getFrameCount() < Options::Tournament::GAME_END_FRAME)
 		{
-			if (isWinner)
-			{
-				results[getCurrentStrategy()].first = results[getCurrentStrategy()].first + 1;
-			}
-			else
-			{
-				results[getCurrentStrategy()].second = results[getCurrentStrategy()].second + 1;
-			}
+			win = isWinner;
 		}
 		// otherwise game timed out so use in-game score
 		else
 		{
 			if (getScore(BWAPI::Broodwar->self()) > getScore(BWAPI::Broodwar->enemy()))
 			{
-				results[getCurrentStrategy()].first = results[getCurrentStrategy()].first + 1;
-			}
-			else
-			{
-				results[getCurrentStrategy()].second = results[getCurrentStrategy()].second + 1;
+				win = true;
 			}
 		}
 		
+		if(results.find(currentStrategy) == results.end()){
+			results[currentStrategy] = std::pair<int, int>(0,0);
+		}
+
+		if(win) {
+			results[currentStrategy].first += 1;
+		} else {
+			results[currentStrategy].second += 1;
+		}
+
 		writeResults();
+
+
 	}
 }
 

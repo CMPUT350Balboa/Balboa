@@ -14,7 +14,7 @@
 #include "UAlbertaBotModule.h"
 
 
-BWAPI::AIModule * __NewAIModule()
+BWAPI::AIModule * __NewAIModule() 
 {
 	return new UAlbertaBotModule();
 }
@@ -24,6 +24,8 @@ UAlbertaBotModule::~UAlbertaBotModule() {}
 
 void UAlbertaBotModule::onStart()
 {
+
+
 	BWAPI::Broodwar->setLocalSpeed(0);
 	//BWAPI::Broodwar->setFrameSkip(240);
 
