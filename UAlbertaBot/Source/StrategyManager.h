@@ -23,7 +23,7 @@ class StrategyManager
 	std::string					readDir;
 	std::string					writeDir;
 
-	//The pair represents wins/losses total 
+	//The pair represents wins/losses total
 	mutable std::map<std::string, std::pair<int,int>>	results;
 
 	std::vector<std::string>	usableStrategies;
@@ -31,6 +31,7 @@ class StrategyManager
 
 	std::string					currentStrategy;
 	std::string					lastStrategy;
+	std::string					changedStrategy;
 
 	BWAPI::Race					selfRace;
 	BWAPI::Race					enemyRace;

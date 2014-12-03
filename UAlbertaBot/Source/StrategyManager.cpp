@@ -22,6 +22,7 @@ const std::string StrategyManager::ZERG_ZERGLING_RUSH = "ZERG_ZERGLING_RUSH";
 StrategyManager::StrategyManager() 
 	: firstAttackSent(false)
 	, currentStrategy(PROTOSS_ZEALOT_RUSH)
+	, changedStrategy()
 	, selfRace(BWAPI::Broodwar->self()->getRace())
 	, enemyRace(BWAPI::Broodwar->enemy()->getRace())
 {
@@ -263,14 +264,14 @@ void StrategyManager::onEnd(const bool isWinner)
 
 		//If we changed strategies because of a loss, record it
 
-		if(currentStrategy != lastStrategy) {
+		if(currentStrategy.compare(changedStrategy) == 0) {
 
 			//Initialize if we haven't used this strategy before
-			if(results.find(lastStrategy) == results.end()){
-				results[lastStrategy] = std::pair<int, int>(0,0);
+			if(results.find(changedStrategy) == results.end()){
+				results[changedStrategy] = std::pair<int, int>(0,0);
 			}
 
-			results[lastStrategy].second += 1;
+			results[changedStrategy].second += 1;
 		}
 
 		writeResults();
@@ -911,6 +912,7 @@ const std::string StrategyManager::getLastStrategy()
 // Accessor function: set the current strategy to a new strategy as selected by DynamicStrategyManager
 void StrategyManager::setCurrentStrategy(std::string new_strategy)
 {
+	changedStrategy = currentStrategy;
 	currentStrategy = new_strategy;
 
 }
