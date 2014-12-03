@@ -85,8 +85,8 @@ void StrategyManager::readResults()
 	// if the file doesn't exist something is wrong so just set them to default settings
 	if (stat(Options::FileIO::FILE_SETTINGS, &buf) == -1)
 	{
-		readDir = "bwapi-data/testio/read/";
-		writeDir = "bwapi-data/testio/write/";
+		readDir = "bwapi-data/read/";
+		writeDir = "bwapi-data/write/";
 	}
 	else
 	{
@@ -147,7 +147,7 @@ void StrategyManager::writeResults()
 
 void StrategyManager::setStrategy()
 {
-	    //hardcoded list of opponents that suck against UAlbertaBot's Zealot Rush
+	//hardcoded list of opponents that suck against UAlbertaBot's Zealot Rush
 	std::string enemyId(BWAPI::Broodwar->enemy()->getName());
 	if((enemyId.compare("NUSBot") == 0) ||
 	   (enemyId.compare("Nova") == 0)  ||
@@ -187,10 +187,12 @@ void StrategyManager::setStrategy()
 			if (results.find(*usableIter) == results.end())
 			{
 				currentStrategy = *usableIter;
+				lastStrategy = currentStrategy;
 				return;
 			}
 		}
 
+		bestStrategyName =  PROTOSS_ZEALOT_RUSH;
 		// if we have tried everything once, set the maximizing ucb value
 		std::map<std::string, std::pair<int, int> >::iterator resultsIter;
 
@@ -204,8 +206,11 @@ void StrategyManager::setStrategy()
 				bestStrategyName = resultsIter->first;
 			}
 		}
-		
+		//BWAPI::Broodwar->printf("Current Strategy: %s", currentStrategy.c_str());	//@@
 		currentStrategy = bestStrategyName;
+		lastStrategy = currentStrategy;
+
+
 	}
 }
 
@@ -761,6 +766,27 @@ const MetaPairVector StrategyManager:: getProtossDragoonsDefendBuildOrderGoal() 
 	int gatewayWanted = 3;
 	int probesWanted = numProbes + 6;
 
+	// @@Additions for dynamic strategy switches to ensure key opening book elements are complete
+	if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Assimilator))
+	{
+		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Assimilator, 1));
+	}
+	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Assimilator) >0)
+	{
+		if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core))
+			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Cybernetics_Core, 1));
+	}
+	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core) >0)
+	{
+		if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Citadel_of_Adun))
+			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Citadel_of_Adun, 1));
+	}
+	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Citadel_of_Adun) >0)
+	{
+		if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Templar_Archives))
+			goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Templar_Archives, 1));
+	}
+
 	if (InformationManager::Instance().enemyHasCloakedUnits())
 	{
 		
@@ -861,8 +887,8 @@ const MetaPairVector StrategyManager::getZergBuildOrderGoal() const
  }
   void StrategyManager::setCurrentStrategy(std::string new_strategy) //@@
  {
-	 BWAPI::Broodwar->printf("Last Strategy %s, current strategy %s, new_strategy %s", lastStrategy, currentStrategy, new_strategy);
 	 currentStrategy = new_strategy;
+
  }
 
     void StrategyManager::setLastStrategy(std::string current_strategy) //@@
