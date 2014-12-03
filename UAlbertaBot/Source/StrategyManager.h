@@ -49,7 +49,7 @@ class StrategyManager
 	const	bool				expandProtossZealotRush() const;
 	const	std::string			getProtossZealotRushOpeningBook() const;
 	const	MetaPairVector		getProtossZealotRushBuildOrderGoal() const;
-	const	MetaPairVector		getProtossCannonRushBuildOrderGoal() const; //@@
+	const	MetaPairVector		getProtossCannonRushBuildOrderGoal() const; //not utilized currently
 
 	const	bool				expandProtossDarkTemplar() const;
 	const	std::string			getProtossDarkTemplarOpeningBook() const;
@@ -103,9 +103,9 @@ public:
 	const	bool				rushDetected();
 
 	const	std::string			getCurrentStrategy();
-	const	std::string			getLastStrategy();						//@@ utilizes by DynamicStrategyManager
-	void						setCurrentStrategy(std::string new_strategy);	//@@
-	void						setLastStrategy(std::string current_strategy);	//@@
+	const	std::string			getLastStrategy(); // accessor returns previous strategy 
+	void						setCurrentStrategy(std::string new_strategy);	// accessor sets the current strategy
+	void						setLastStrategy(std::string current_strategy);	// accessor sets the previous strategy
 
 
 	const	MetaPairVector		getBuildOrderGoal();

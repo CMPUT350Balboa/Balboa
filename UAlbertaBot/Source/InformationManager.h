@@ -89,7 +89,8 @@ public:
 
 	SparCraft::Map *			getMap() { return &map; }
 
-	const UnitData &			getUnitDetail(BWAPI::Player * player) const;//@@
+	// A public accessor version of getUnitData, required by DynamicStrategyManager
+	const UnitData &			getUnitDetail(BWAPI::Player * player) const;
 };
 
 

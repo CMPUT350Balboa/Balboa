@@ -1,6 +1,6 @@
 #include "Common.h"
 #include "InformationManager.h"
-#include "StrategyManager.h" //@@
+#include "StrategyManager.h"
 
 #define SELF_INDEX 0
 #define ENEMY_INDEX 1
@@ -439,7 +439,8 @@ const UnitData & InformationManager::getUnitData(BWAPI::Unit * unit) const
 	return getUnitData(unit->getPlayer());
 }
 
-const UnitData & InformationManager::getUnitDetail(BWAPI::Player * player) const //@@ I needed a public version of this method
+// A public accessor version of getUnitData, required by DynamicStrategyManager
+const UnitData & InformationManager::getUnitDetail(BWAPI::Player * player) const 
 {
 	return (player == BWAPI::Broodwar->self()) ? selfUnitData : enemyUnitData;
 }

@@ -7,10 +7,13 @@
 
 #include "..\..\SparCraft\source\SparCraft.h"
 
-// This is a new class written by Michael Williams
-// Enemy strategy detection and counter strategy switching
-//
-// See also code in ProductionManager that performs the new build order search
+// DynamicStrategyManager evaluates enemy units and buildings
+// to determine the enemy build order and strategy, and changes the current
+// strategy based on the evaluation. The class is a singleton that allows frame by
+// frame updates triggered by Game Commander timer events. The strategy information is
+// passed back and forth between DynamicStrategyManger and StrategyManager, which has no
+// update functionality, giving the ability to change strategy on the fly.
+// Also refer to: code in ProductionManager that performs the new build order search
 
 class DynamicStrategyManager
 {

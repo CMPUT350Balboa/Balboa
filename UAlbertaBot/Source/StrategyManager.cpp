@@ -206,7 +206,6 @@ void StrategyManager::setStrategy()
 				bestStrategyName = resultsIter->first;
 			}
 		}
-		//BWAPI::Broodwar->printf("Current Strategy: %s", currentStrategy.c_str());	//@@
 		currentStrategy = bestStrategyName;
 		lastStrategy = currentStrategy;
 
@@ -458,7 +457,8 @@ const MetaPairVector StrategyManager::getProtossDragoonsBuildOrderGoal() const
 	int gatewayWanted = 3;
 	int probesWanted = numProbes + 6;
 
-		// @@Additions for dynamic strategy switches to ensure key opening book elements are complete
+	// Additions for dynamic strategy changes to ensure key opening book elements are complete
+	// if we have switched into the strategy from another
 	if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Assimilator))
 	{
 		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Assimilator, 1));
@@ -547,7 +547,8 @@ const MetaPairVector StrategyManager::getProtossDarkTemplarBuildOrderGoal() cons
 	int gatewayWanted = 3;
 	int probesWanted = numProbes + 6;
 
-		// @@Additions for dynamic strategy switches to ensure key opening book elements are complete
+	// Additions for dynamic strategy changes to ensure key opening book elements are complete
+	// if we have switched into the strategy from another
 	if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Assimilator))
 	{
 		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Assimilator, 1));
@@ -637,12 +638,8 @@ const MetaPairVector StrategyManager::getProtossZealotRushBuildOrderGoal() const
 	int gatewayWanted = 3;
 	int probesWanted = numProbes + 4;
 
-	//Already covered by gatewayWanted above
-	//@@Additions for dynamic strategy switches to ensure key opening book elements are complete
-	//if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Gateway) < 2)
-	//{
-	//	goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Gateway, 1));
-	//}
+	// Additions for dynamic strategy changes to ensure key opening book elements are complete
+	// if we have switched into the strategy from another
 	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Assimilator) >0)
 	{
 		if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Cybernetics_Core))
@@ -766,7 +763,8 @@ const MetaPairVector StrategyManager:: getProtossDragoonsDefendBuildOrderGoal() 
 	int gatewayWanted = 3;
 	int probesWanted = numProbes + 6;
 
-	// @@Additions for dynamic strategy switches to ensure key opening book elements are complete
+	// Additions for dynamic strategy changes to ensure key opening book elements are complete
+	// if we have switched into the strategy from another
 	if (!BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Assimilator))
 	{
 		goal.push_back(MetaPair(BWAPI::UnitTypes::Protoss_Assimilator, 1));
@@ -876,22 +874,24 @@ const MetaPairVector StrategyManager::getZergBuildOrderGoal() const
 	return (const std::vector< std::pair<MetaType, UnitCountType> >)goal;
 }
 
- const std::string StrategyManager::getCurrentStrategy()
- {
-	 return currentStrategy;
- }
+const std::string StrategyManager::getCurrentStrategy()
+{
+	return currentStrategy;
+}
 
- const std::string StrategyManager::getLastStrategy() //@@
- {
-	 return lastStrategy;
- }
-  void StrategyManager::setCurrentStrategy(std::string new_strategy) //@@
- {
-	 currentStrategy = new_strategy;
+// Accessor function: returns the last strategy that had been in use
+const std::string StrategyManager::getLastStrategy() 
+{
+	return lastStrategy;
+}
+// Accessor function: set the current strategy to a new strategy as selected by DynamicStrategyManager
+void StrategyManager::setCurrentStrategy(std::string new_strategy)
+{
+	currentStrategy = new_strategy;
 
- }
-
-    void StrategyManager::setLastStrategy(std::string current_strategy) //@@
- {
-	 lastStrategy = current_strategy;
- }
+}
+// Accessor function: set the last strategy to match the strategy currently in effect
+void StrategyManager::setLastStrategy(std::string current_strategy)
+{
+	lastStrategy = current_strategy;
+}

@@ -23,7 +23,7 @@ class TimerManager
 
 public:
 
-	//@@ added Dynamic type
+	// added DynamicStrategyManager type
 	enum Type { All, Worker, Production, Building, Combat, Scout, InformationManager, MapGrid, MapTools, Search, DynamicStrategyManager, NumTypes };
 	
 
@@ -39,7 +39,7 @@ public:
 		timerNames.push_back("MapGrid");
 		timerNames.push_back("MapTools");
 		timerNames.push_back("Search");
-		timerNames.push_back("Dynamic"); //@@
+		timerNames.push_back("Dynamic"); // added for DynamicStrategyManager
 
 	}
 
