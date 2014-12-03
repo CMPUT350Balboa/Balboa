@@ -67,6 +67,8 @@ void Squad::updateUnits()
 void Squad::setAllUnits()
 {
 	// clean up the units vector just in case one of them died
+
+	//Fixed bug where unit was null
 	UnitVector goodUnits;
 	BOOST_FOREACH(BWAPI::Unit * unit, units)
 	{

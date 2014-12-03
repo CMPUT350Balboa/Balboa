@@ -38,6 +38,8 @@ StrategyManager & StrategyManager::Instance()
 
 void StrategyManager::addStrategies() 
 {
+	//Add all of the opening books to our strategies
+
 	strategies[PROTOSS_ZEALOT_RUSH] = "0 0 0 0 1 0 3 3 0 0 4 1 4 4 0 4 4 0 1 4 3 0 1 0 4 0 4 4 4 4 1 0 4 4 4";
 	strategies[PROTOSS_DARK_TEMPLAR] = "0 0 0 0 1 0 3 0 7 0 5 0 12 0 13 3 22 22 1 22 22 0 1 0";
 	strategies[PROTOSS_DRAGOONS] = "0 0 0 0 1 0 0 3 0 7 0 0 5 0 0 3 8 6 1 6 6 0 3 1 0 6 6 6";
@@ -54,6 +56,8 @@ void StrategyManager::addStrategies()
 
 	if (selfRace == BWAPI::Races::Protoss)
 	{
+		//If we are protoss we want to add all protoss strategies
+
 		usableStrategies.push_back(PROTOSS_DARK_TEMPLAR);
 		usableStrategies.push_back(PROTOSS_DRAGOONS);
 		usableStrategies.push_back(PROTOSS_ZEALOT_RUSH);
@@ -77,36 +81,40 @@ void StrategyManager::addStrategies()
 	}
 }
 
+//Reads the results of previous games vs this enemy
 void StrategyManager::readResults()
 {
-	// read in the name of the read and write directories from settings file
+	//Check if we were provided with a file to check for settings
 	struct stat buf;
-
-	// if the file doesn't exist something is wrong so just set them to default settings
 	if (stat(Options::FileIO::FILE_SETTINGS, &buf) == -1)
 	{
+		//Default if we weren't
 		readDir = "bwapi-data/read/";
 		writeDir = "bwapi-data/write/";
 	}
 	else
 	{
+		//Otherwise read the directories from there
 		std::ifstream f_in(Options::FileIO::FILE_SETTINGS);
 		getline(f_in, readDir);
 		getline(f_in, writeDir);
 		f_in.close();
 	}
 
-	// the file corresponding to the enemy's previous results
+	//Each enemy has their own file
 	std::string readFile = readDir + BWAPI::Broodwar->enemy()->getName() + ".txt";
 
-
-	// if the file exists read it in
+	// if the file exists (we've seen this enemy before)
 	if(stat(readFile.c_str(), &buf) != -1)
 	{
+
 		std::ifstream f_in(readFile.c_str());
 		std::string line;
 
+		//Loop line by line, file format is STRATEGY WINS LOSSES\n
 		while(getline(f_in, line)) {
+			
+			//Use a string stream for ease of use
 			std::stringstream stream(line);
 			
 			int wins;
@@ -125,22 +133,22 @@ void StrategyManager::readResults()
 	}
 }
 
-//Iterates through our map of results and prints them as ID WINS LOSSES\n
+//Iterates through our map of results and prints them to a file corresponding
+//To the enemy name as 
+//ID WINS LOSSES\n
+
 void StrategyManager::writeResults()
 {
-
-
-
+	//Open the file
 	std::string writeFile = writeDir + BWAPI::Broodwar->enemy()->getName() + ".txt";
 	std::ofstream f_out(writeFile.c_str());
 
-
+	//Iterate over all results, writing them
 	std::map<std::string, std::pair<int, int> >::iterator iter;
 
     for (iter = results.begin(); iter != results.end(); ++iter) {
 		f_out << iter->first << " " << iter->second.first << " " << iter->second.second << "\n";
 	}	
-
 
 	f_out.close();
 }
@@ -181,9 +189,11 @@ void StrategyManager::setStrategy()
 
 		std::vector<std::string>::iterator usableIter;
 
-		// UCB requires us to try everything once before using the formula
+		//Loop through all the strategies we are using vs this opponent
+		//Make sure we try all of them before doing UCB
 		for (usableIter = usableStrategies.begin(); usableIter != usableStrategies.end(); ++usableIter) 
 		{
+			//We haven't seen this strategy, let's use it
 			if (results.find(*usableIter) == results.end())
 			{
 				currentStrategy = *usableIter;
@@ -192,35 +202,36 @@ void StrategyManager::setStrategy()
 			}
 		}
 
+		//We've tried all the strategies, let's take the most effective one
+
 		bestStrategyName =  PROTOSS_ZEALOT_RUSH;
-		// if we have tried everything once, set the maximizing ucb value
 		std::map<std::string, std::pair<int, int> >::iterator resultsIter;
 
 		for (resultsIter = results.begin(); resultsIter != results.end(); ++resultsIter) 
 		{
+
 			double ucb = getUCBValue(resultsIter->first);
 
+			//Select the highest UCB value
 			if (ucb > bestUCB)
 			{
 				bestUCB = ucb;
 				bestStrategyName = resultsIter->first;
 			}
 		}
+
+		//Use the stategy selected by UCB
 		currentStrategy = bestStrategyName;
 		lastStrategy = currentStrategy;
-
 
 	}
 }
 
 void StrategyManager::onEnd(const bool isWinner)
 {
-
-
-
-	// write the win/loss data to file if we're using IO
 	if (Options::Modules::USING_STRATEGY_IO)
 	{
+		//Determine the results of the game
 		bool win = false;
 
 		// if the game ended before the tournament time limit
@@ -228,6 +239,7 @@ void StrategyManager::onEnd(const bool isWinner)
 		{
 			win = isWinner;
 		}
+
 		// otherwise game timed out so use in-game score
 		else
 		{
@@ -237,19 +249,31 @@ void StrategyManager::onEnd(const bool isWinner)
 			}
 		}
 		
+		//Initialize if we haven't used this strategy before
 		if(results.find(currentStrategy) == results.end()){
 			results[currentStrategy] = std::pair<int, int>(0,0);
 		}
 
+		//If we won, record it, otherwise record a loss
 		if(win) {
 			results[currentStrategy].first += 1;
 		} else {
 			results[currentStrategy].second += 1;
 		}
 
+		//If we changed strategies because of a loss, record it
+
+		if(currentStrategy != lastStrategy) {
+
+			//Initialize if we haven't used this strategy before
+			if(results.find(lastStrategy) == results.end()){
+				results[lastStrategy] = std::pair<int, int>(0,0);
+			}
+
+			results[lastStrategy].second += 1;
+		}
+
 		writeResults();
-
-
 	}
 }
 
