@@ -109,12 +109,15 @@
       <GenerateMapFile>true</GenerateMapFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy Release\UAlbertaBot.dll C:\StarCraft\bwapi-data\AI /y</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\base\BuildLearner.cpp" />
     <ClCompile Include="..\Source\CombatSimulation.cpp" />
+    <ClCompile Include="..\Source\DynamicStrategyManager.cpp" />
+    <ClCompile Include="..\Source\micromanagement\ProtossScoutManager.cpp" />
     <ClCompile Include="..\Source\MicroSearchManager.cpp" />
     <ClCompile Include="..\Source\base\BuildingData.cpp" />
     <ClCompile Include="..\Source\base\BuildingManager.cpp" />
@@ -156,6 +159,8 @@
   <ItemGroup>
     <ClInclude Include="..\Source\base\BuildLearner.h" />
     <ClInclude Include="..\Source\CombatSimulation.h" />
+    <ClInclude Include="..\Source\DynamicStrategyManager.h" />
+    <ClInclude Include="..\Source\micromanagement\ProtossScoutManager.h" />
     <ClInclude Include="..\Source\MicroSearchManager.h" />
     <ClInclude Include="..\Source\base\BuildingData.h" />
     <ClInclude Include="..\Source\base\BuildingManager.h" />

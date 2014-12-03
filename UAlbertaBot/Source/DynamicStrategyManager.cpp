@@ -51,7 +51,7 @@ void DynamicStrategyManager::searchNewStrategy()
 	enemyTypeCountMap.clear();
 	enemyTypeCountMap = getUnitTypeCountMap(enemyUnitData);
 
-	int strategy =-1;
+	std::string strategy = std::string();
 	int zealot = 0;
 	int dragoon = 0;
 	int dark_templar = 0;
@@ -72,36 +72,42 @@ void DynamicStrategyManager::searchNewStrategy()
 		dark_templar += (enemyTypeCountMap[BWAPI::UnitTypes::Protoss_Citadel_of_Adun] > 0); 
 		dark_templar += (enemyTypeCountMap[BWAPI::UnitTypes::Protoss_Dark_Templar] > 0);
 		
-		if (zealot) {strategy = ProtossZealotRush;}						// give weight to zealot rush, as opponent has two gateways
+		if (zealot) {strategy = StrategyManager::PROTOSS_ZEALOT_RUSH;}						// give weight to zealot rush, as opponent has two gateways
 		if (dark_templar || dragoon)									// enemy building higher tech so:
 		{									
-			if (dark_templar > dragoon) {strategy = ProtossDragoons;}	// focus on Dragoons to counter Dark Templar
-			else {strategy = ProtossZealotRush;}						// focus on Zealot rush to counter Dragoons
+			if (dark_templar > dragoon) {strategy = StrategyManager::PROTOSS_DRAGOONS;}	// focus on Dragoons to counter Dark Templar
+			else {strategy = StrategyManager::PROTOSS_ZEALOT_RUSH;}						// focus on Zealot rush to counter Dragoons
 		}
 
 
 
 		//if we have completed full tech tree for strategy, don't switch to a new strategy
-		if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Citadel_of_Adun) > 0) {strategy = ProtossDarkTemplar;}
-		if (BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge) > 0) {strategy = ProtossDragoons;}
+		if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Citadel_of_Adun) > 0) {strategy = StrategyManager::PROTOSS_DARK_TEMPLAR;}
+		if (BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge) > 0) {strategy =  StrategyManager::PROTOSS_DRAGOONS;}
 		
-		if (Options::Debug::DRAW_UALBERTABOT_DEBUG)
+		/*if (Options::Debug::DRAW_UALBERTABOT_DEBUG)
 		{
 			BWAPI::Broodwar->drawTextScreen(140, 300, "\x04<<< BEST COUNTER STRATEGY: %d >>>", strategy);
 			BWAPI::Broodwar->drawTextScreen(140, 220, "\x07 zealot %d", zealot);
 			BWAPI::Broodwar->drawTextScreen(140, 230, "\x07 dragoon %d", dragoon);
 			BWAPI::Broodwar->drawTextScreen(140, 240, "\x07 DT %d", dark_templar);
-			BWAPI::Broodwar->drawTextScreen(140, 250, "\x07 guess_strategy %d", strategy);
-			BWAPI::Broodwar->drawTextScreen(140, 260, "\x07 my_strategy %d", StrategyManager::Instance().getCurrentStrategy());
+
+			if(strategy.empty()){
+				BWAPI::Broodwar->drawTextScreen(140, 250, "\x07 guess_strategy none");
+			} else {
+				BWAPI::Broodwar->drawTextScreen(140, 250, "\x07 guess_strategy %s", strategy);
+			}
+
+			BWAPI::Broodwar->drawTextScreen(140, 260, "\x07 my_strategy %s", StrategyManager::Instance().getCurrentStrategy());
 			BWAPI::Broodwar->drawTextScreen(140, 270, "\x07 number_switches %d", numSwitches);
-		}
+		}*/
 		
 		
 		//std::stringstream log;
 		//log << "zealot, " << zealot << "dragoon ," << dragoon << "DT ," <<  dark_templar << "guess_strategy ," << strategy << "my_strategy \n" << StrategyManager::Instance().getCurrentStrategy();
 		//Logger::Instance().log(log.str());
 		
-		if (StrategyManager::Instance().getCurrentStrategy() != strategy && strategy > -1)
+		if (StrategyManager::Instance().getCurrentStrategy() != strategy && !strategy.empty())
 		{
 			StrategyManager::Instance().setCurrentStrategy(strategy);
 			++numSwitches;			

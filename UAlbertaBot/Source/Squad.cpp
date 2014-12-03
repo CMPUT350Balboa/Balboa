@@ -181,10 +181,10 @@ bool Squad::needsToRegroup()
 		return false;
 	}
 
-	if((StrategyManager::Instance().getCurrentStrategy() ==  StrategyManager::ProtossScoutRush) && units.size() > 20){
+	if((StrategyManager::Instance().getCurrentStrategy() ==  StrategyManager::PROTOSS_SCOUT_RUSH) && units.size() > 20){
 		return false;
 	}
-	if((StrategyManager::Instance().getCurrentStrategy() ==  StrategyManager::ProtossDragoonDefend) && units.size() > 15){
+	if((StrategyManager::Instance().getCurrentStrategy() ==  StrategyManager::PROTOSS_DRAGOON_DEFEND) && units.size() > 15){
 		return false;
 	}
 	CombatSimulation sim;

@@ -9,7 +9,6 @@ const std::string StrategyManager::PROTOSS_SCOUT_RUSH = "PROTOSS_SCOUT_RUSH";
 const std::string StrategyManager::PROTOSS_CANNON_DEFEND_AND_ZEALOT_RUSH = "PROTOSS_CANNON_DEFEND_AND_ZEALOT_RUSH";
 
 
-
 //Terran Strategies
 
 const std::string StrategyManager::TERRAN_MARINE_RUSH = "TERRAN_MARINE_RUSH";
@@ -22,7 +21,7 @@ const std::string StrategyManager::ZERG_ZERGLING_RUSH = "ZERG_ZERGLING_RUSH";
 // constructor
 StrategyManager::StrategyManager() 
 	: firstAttackSent(false)
-	, currentStrategy("PROTOSS_ZEALOT_RUSH")
+	, currentStrategy(PROTOSS_ZEALOT_RUSH)
 	, selfRace(BWAPI::Broodwar->self()->getRace())
 	, enemyRace(BWAPI::Broodwar->enemy()->getRace())
 {
@@ -61,7 +60,6 @@ void StrategyManager::addStrategies()
 		usableStrategies.push_back(PROTOSS_SCOUT_RUSH);
 		usableStrategies.push_back(PROTOSS_CANNON_DEFEND_AND_ZEALOT_RUSH);
 		usableStrategies.push_back(PROTOSS_DRAGOON_DEFEND);
-
 	}
 	else if (selfRace == BWAPI::Races::Terran)
 	{
@@ -71,6 +69,7 @@ void StrategyManager::addStrategies()
 	{
 		usableStrategies.push_back(ZERG_ZERGLING_RUSH);
 	}
+
 
 	if (Options::Modules::USING_STRATEGY_IO)
 	{
