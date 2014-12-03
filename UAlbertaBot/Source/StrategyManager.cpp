@@ -159,18 +159,19 @@ void StrategyManager::setStrategy()
 {
     //hardcoded list of opponents that suck against UAlbertaBot's Zealot Rush
 	std::string enemyId(BWAPI::Broodwar->enemy()->getName());
-	if(enemyId.compare("NUSBot") == 0 ||
-	   enemyId.compare("Nova") == 0  ||
-	   enemyId.compare("HITA") == 0  ||
-	   enemyId.compare("CruzBot") == 0 ||
-	   enemyId.compare("Bonjwa") == 0 ||
-	   enemyId.compare("Oritaka") == 0 ||
-	   enemyId.compare("Yarmouk") == 0 ||
-	   enemyId.compare("MaasCraft") == 0 ||
-	   enemyId.compare("Xelnaga") == 0 ||
-	   enemyId.compare("TerranUAB") == 0) 
+	if((enemyId.compare("NUSBot") == 0) ||
+	   (enemyId.compare("Nova") == 0)  ||
+	   (enemyId.compare("HITA") == 0)  ||
+	   (enemyId.compare("CruzBot") == 0) ||
+	   (enemyId.compare("Bonjwa") == 0) ||
+	   (enemyId.compare("Oritaka") == 0) ||
+	   (enemyId.compare("Yarmouk") == 0) ||
+	   (enemyId.compare("MaasCraft") == 0) ||
+	   (enemyId.compare("Xelnaga") == 0) ||
+	   (enemyId.compare("TerranUAB") == 0)) 
 	{
-		currentStrategy = ProtossZealotRush;   
+		currentStrategy = ProtossZealotRush;
+		lastStrategy = currentStrategy;
 		return;
 	}
 	//Specific strategy to counter LetaBot, can still be tweaked
@@ -178,6 +179,7 @@ void StrategyManager::setStrategy()
 	if(enemyId.compare("LetaBot") == 0)
 	{
 		currentStrategy = ProtossCannonDefendAndZealotRush;
+		lastStrategy = currentStrategy;
 		return;
 	}
 
