@@ -38,6 +38,7 @@ public:
 	void						updateWorkerStatus();
 	void						drawWorkerInformation(int x, int y);
 
+	int							getNumWorkers(); //@@
 	int							getNumMineralWorkers();
 	int							getNumGasWorkers();
 	int							getNumIdleWorkers();

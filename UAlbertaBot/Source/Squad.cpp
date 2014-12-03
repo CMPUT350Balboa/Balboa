@@ -42,6 +42,7 @@ void Squad::update()
 
 		meleeManager.regroup(regroupPosition);
 		rangedManager.regroup(regroupPosition);
+		pScoutManager.regroup(regroupPosition);
 	}
 	else // otherwise, execute micro
 	{
@@ -50,7 +51,7 @@ void Squad::update()
 		meleeManager.execute(order);
 		rangedManager.execute(order);
 		transportManager.execute(order);
-
+		pScoutManager.execute(order);
 		detectorManager.setUnitClosestToEnemy(unitClosestToEnemy());
 		detectorManager.execute(order);
 	}
@@ -112,6 +113,7 @@ void Squad::setManagerUnits()
 	UnitVector rangedUnits;
 	UnitVector detectorUnits;
 	UnitVector transportUnits;
+	UnitVector protossScoutUnits;
 
 	// add units to micro managers
 	BOOST_FOREACH(BWAPI::Unit * unit, units)
@@ -127,6 +129,11 @@ void Squad::setManagerUnits()
 			else if (unit->getType() == BWAPI::UnitTypes::Protoss_Shuttle || unit->getType() == BWAPI::UnitTypes::Terran_Dropship)
 			{
 				transportUnits.push_back(unit);
+			}
+			// protoss scouts 
+			else if (unit->getType() == BWAPI::UnitTypes::Protoss_Scout)
+			{
+				protossScoutUnits.push_back(unit);
 			}
 			// select ranged units
 			else if ((unit->getType().groundWeapon().maxRange() > 32) || (unit->getType() == BWAPI::UnitTypes::Protoss_Reaver))
@@ -145,6 +152,7 @@ void Squad::setManagerUnits()
 	rangedManager.setUnits(rangedUnits);
 	detectorManager.setUnits(detectorUnits);
 	transportManager.setUnits(detectorUnits);
+	pScoutManager.setUnits(protossScoutUnits);
 }
 
 // calculates whether or not to regroup
@@ -173,6 +181,12 @@ bool Squad::needsToRegroup()
 		return false;
 	}
 
+	if((StrategyManager::Instance().getCurrentStrategy() ==  StrategyManager::ProtossScoutRush) && units.size() > 20){
+		return false;
+	}
+	if((StrategyManager::Instance().getCurrentStrategy() ==  StrategyManager::ProtossDragoonDefend) && units.size() > 15){
+		return false;
+	}
 	CombatSimulation sim;
 	sim.setCombatUnits(unitClosest->getPosition(), Options::Micro::COMBAT_REGROUP_RADIUS + InformationManager::Instance().lastFrameRegroup*300);
 	ScoreType score = sim.simulateCombat();

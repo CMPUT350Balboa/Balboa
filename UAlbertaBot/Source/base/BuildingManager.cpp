@@ -145,6 +145,29 @@ BWAPI::TilePosition BuildingManager::getBuildingLocation(const Building & b)
 		return BuildingPlacer::Instance().getRefineryPosition();
 	}
 
+	/* @@
+	BWTA::Chokepoint * test;
+	if (b.type == BWAPI::UnitTypes::Protoss_Pylon && (numPylons > 3)){
+
+		test = BWTA::getNearestChokepoint(BWTA::getStartLocation(BWAPI::Broodwar->self())->getTilePosition());
+		BWAPI::TilePosition posInRegion = (BWAPI::TilePosition)test->getCenter();
+
+		return posInRegion;
+
+	}
+
+	// @@ Build cannon at chokepoint{
+	if (b.type == BWAPI::UnitTypes::Protoss_Photon_Cannon){
+
+		BWAPI::Broodwar->printf("******************************* BUILDING PHOTON CANNON\n");
+		test = BWTA::getNearestChokepoint(BWTA::getStartLocation(BWAPI::Broodwar->self())->getTilePosition());
+		BWAPI::TilePosition posInRegion = (BWAPI::TilePosition)test->getCenter();
+
+		return posInRegion;
+
+	}
+	*/ //@@
+
 	// special case for early pylons
 	if (b.type == BWAPI::UnitTypes::Protoss_Pylon && (numPylons < 3))
 	{
