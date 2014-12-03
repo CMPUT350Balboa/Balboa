@@ -20,16 +20,17 @@ class StrategyManager
 	StrategyManager();
 	~StrategyManager() {}
 
-	std::vector<std::string>	protossOpeningBook;
-	std::vector<std::string>	terranOpeningBook;
-	std::vector<std::string>	zergOpeningBook;
-
 	std::string					readDir;
 	std::string					writeDir;
-	std::vector<IntPair>		results;
-	std::vector<int>			usableStrategies;
-	int							currentStrategy;
-	int							lastStrategy;
+
+	//The pair represents wins/losses total 
+	mutable std::map<std::string, std::pair<int,int>>	results;
+
+	std::vector<std::string>	usableStrategies;
+	mutable std::map<std::string, std::string> strategies;
+
+	std::string					currentStrategy;
+	std::string					lastStrategy;
 
 	BWAPI::Race					selfRace;
 	BWAPI::Race					enemyRace;
@@ -42,7 +43,7 @@ class StrategyManager
 	void	writeResults();
 
 	const	int					getScore(BWAPI::Player * player) const;
-	const	double				getUCBValue(const size_t & strategy) const;
+	const	double				getUCBValue(const std::string) const;
 	
 	// protoss strategy
 	const	bool				expandProtossZealotRush() const;
@@ -72,10 +73,25 @@ class StrategyManager
 
 public:
 
-	enum { ProtossZealotRush=0, ProtossDarkTemplar=1, ProtossDragoons=2, ProtossCannonDefendAndZealotRush = 3, ProtossScoutRush = 4, ProtossDragoonDefend = 5, NumProtossStrategies= 6 };
+	//These need to be initialized in cpp with unique ids.
 
-	enum { TerranMarineRush=0, NumTerranStrategies=1 };
-	enum { ZergZerglingRush=0, NumZergStrategies=1 };
+	//Protoss Strategies
+
+	static const std::string PROTOSS_ZEALOT_RUSH;
+	static const std::string PROTOSS_DARK_TEMPLAR;
+	static const std::string PROTOSS_DRAGOONS;
+	static const std::string PROTOSS_DRAGOON_DEFEND;
+	static const std::string PROTOSS_SCOUT_RUSH;
+	static const std::string PROTOSS_CANNON_DEFEND_AND_ZEALOT_RUSH;
+
+
+	//Terran Strategies
+
+	static const std::string TERRAN_MARINE_RUSH;
+
+	//Zerg Strategies
+
+	static const std::string ZERG_ZERGLING_RUSH;
 
 	static	StrategyManager &	Instance();
 
@@ -86,10 +102,11 @@ public:
 	const	int				    defendWithWorkers();
 	const	bool				rushDetected();
 
-	const	int					getCurrentStrategy();
-	const	int					getLastStrategy();						//@@ utilizes by DynamicStrategyManager
-			void				setCurrentStrategy(int new_strategy);	//@@
-			void				setLastStrategy(int current_strategy);	//@@
+	const	std::string			getCurrentStrategy();
+	const	std::string			getLastStrategy();						//@@ utilizes by DynamicStrategyManager
+	void						setCurrentStrategy(std::string new_strategy);	//@@
+	void						setLastStrategy(std::string current_strategy);	//@@
+
 
 	const	MetaPairVector		getBuildOrderGoal();
 	const	std::string			getOpeningBook() const;
