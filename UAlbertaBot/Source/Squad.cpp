@@ -70,7 +70,8 @@ void Squad::setAllUnits()
 	UnitVector goodUnits;
 	BOOST_FOREACH(BWAPI::Unit * unit, units)
 	{
-		if( unit->isCompleted() && 
+		if( unit != NULL &&
+			unit->isCompleted() && 
 			unit->getHitPoints() > 0 && 
 			unit->exists() &&
 			unit->getPosition().isValid() &&
