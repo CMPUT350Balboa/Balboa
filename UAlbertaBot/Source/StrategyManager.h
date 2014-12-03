@@ -30,6 +30,7 @@ class StrategyManager
 	mutable std::map<std::string, std::string> strategies;
 
 	std::string					currentStrategy;
+	std::string					lastStrategy;
 
 	BWAPI::Race					selfRace;
 	BWAPI::Race					enemyRace;
@@ -48,6 +49,7 @@ class StrategyManager
 	const	bool				expandProtossZealotRush() const;
 	const	std::string			getProtossZealotRushOpeningBook() const;
 	const	MetaPairVector		getProtossZealotRushBuildOrderGoal() const;
+	const	MetaPairVector		getProtossCannonRushBuildOrderGoal() const; //@@
 
 	const	bool				expandProtossDarkTemplar() const;
 	const	std::string			getProtossDarkTemplarOpeningBook() const;
@@ -56,6 +58,11 @@ class StrategyManager
 	const	bool				expandProtossDragoons() const;
 	const	std::string			getProtossDragoonsOpeningBook() const;
 	const	MetaPairVector		getProtossDragoonsBuildOrderGoal() const;
+
+	//scout rush strategy 
+	const	MetaPairVector		getProtossScoutRushBuildOrderGoal() const;
+	const   MetaPairVector		getProtossDragoonsDefendBuildOrderGoal() const;
+
 
 	const	MetaPairVector		getTerranBuildOrderGoal() const;
 	const	MetaPairVector		getZergBuildOrderGoal() const;
@@ -73,6 +80,10 @@ public:
 	static const std::string PROTOSS_ZEALOT_RUSH;
 	static const std::string PROTOSS_DARK_TEMPLAR;
 	static const std::string PROTOSS_DRAGOONS;
+	static const std::string PROTOSS_DRAGOON_DEFEND;
+	static const std::string PROTOSS_SCOUT_RUSH;
+	static const std::string PROTOSS_CANNON_DEFEND_AND_ZEALOT_RUSH;
+
 
 	//Terran Strategies
 
@@ -92,6 +103,10 @@ public:
 	const	bool				rushDetected();
 
 	const	std::string			getCurrentStrategy();
+	const	std::string			getLastStrategy();						//@@ utilizes by DynamicStrategyManager
+	void						setCurrentStrategy(std::string new_strategy);	//@@
+	void						setLastStrategy(std::string current_strategy);	//@@
+
 
 	const	MetaPairVector		getBuildOrderGoal();
 	const	std::string			getOpeningBook() const;
