@@ -26,7 +26,6 @@ class DynamicStrategyManager
 public:
 	//DynamicStrategyManager();
 	//~DynamicStrategyManager();
-	enum { ProtossZealotRush=0, ProtossDarkTemplar=1, ProtossDragoons=2, NumProtossStrategies=3 }; //@@change back
 	static DynamicStrategyManager &		Instance();
 	void								update();
 	void								onStart();

@@ -167,7 +167,7 @@ bool Squad::needsToRegroup()
 	}
 
 	// if we are DT rushing and we haven't lost a DT yet, no retreat!
-	if (StrategyManager::Instance().getCurrentStrategy() == StrategyManager::ProtossDarkTemplar &&
+	if (StrategyManager::Instance().getCurrentStrategy() == StrategyManager::PROTOSS_DARK_TEMPLAR &&
 		(BWAPI::Broodwar->self()->deadUnitCount(BWAPI::UnitTypes::Protoss_Dark_Templar) == 0))
 	{
 		regroupStatus = std::string("\x04 DARK TEMPLAR HOOOOO!");
@@ -182,10 +182,10 @@ bool Squad::needsToRegroup()
 		return false;
 	}
 
-	if((StrategyManager::Instance().getCurrentStrategy() ==  StrategyManager::ProtossScoutRush) && units.size() > 20){
+	if((StrategyManager::Instance().getCurrentStrategy() ==  StrategyManager::PROTOSS_SCOUT_RUSH) && units.size() > 20){
 		return false;
 	}
-	if((StrategyManager::Instance().getCurrentStrategy() ==  StrategyManager::ProtossDragoonDefend) && units.size() > 15){
+	if((StrategyManager::Instance().getCurrentStrategy() ==  StrategyManager::PROTOSS_DRAGOON_DEFEND) && units.size() > 15){
 		return false;
 	}
 	CombatSimulation sim;
