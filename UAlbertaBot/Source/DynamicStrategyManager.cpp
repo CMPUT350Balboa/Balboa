@@ -46,6 +46,7 @@ void DynamicStrategyManager::searchNewStrategy()
 
 	std::string strategy = std::string();
 	std::string current_strategy = StrategyManager::Instance().getCurrentStrategy();
+	std::string best_strategy = StrategyManager::Instance().getBestStrategyName();
 	BWAPI::Race enemyRace = BWAPI::Broodwar->enemy()->getRace();
 
 	// Protoss-enemy specific strategies
@@ -72,19 +73,19 @@ void DynamicStrategyManager::searchNewStrategy()
 
 		if (zealot) // give weight to zealot rush strategy, as opponent has two gateways
 		{ 
-			if (current_strategy == StrategyManager::PROTOSS_CANNON_DEFEND_AND_ZEALOT_RUSH) 
+			if (best_strategy == StrategyManager::PROTOSS_CANNON_DEFEND_AND_ZEALOT_RUSH) 
 			{
-				strategy = current_strategy;
-			} else {
+				strategy = best_strategy;
+			} else { 
 				strategy = StrategyManager::PROTOSS_ZEALOT_RUSH;
 			}					
 		}
 		if (dark_templar || dragoon) // enemy is building higher tech, give weight to:
 		{									
 			if (dark_templar > dragoon) { // focus on Dragoons to counter Dark Templar
-				if (current_strategy == StrategyManager::PROTOSS_DRAGOON_DEFEND) 
+				if (best_strategy == StrategyManager::PROTOSS_DRAGOON_DEFEND) 
 				{
-					strategy = current_strategy;
+					strategy = best_strategy;
 				} else
 				{
 					strategy = StrategyManager::PROTOSS_DRAGOONS;	
@@ -92,9 +93,9 @@ void DynamicStrategyManager::searchNewStrategy()
 			} 
 			else // focus on Zealot rush to counter Dragoons
 			{
-				if (current_strategy == StrategyManager::PROTOSS_CANNON_DEFEND_AND_ZEALOT_RUSH) 
+				if (best_strategy == StrategyManager::PROTOSS_CANNON_DEFEND_AND_ZEALOT_RUSH) 
 				{
-					strategy = current_strategy;
+					strategy = best_strategy;
 				} else {
 					strategy = StrategyManager::PROTOSS_ZEALOT_RUSH;
 				}	
@@ -128,9 +129,9 @@ void DynamicStrategyManager::searchNewStrategy()
 	//if we have completed full tech tree for DarkTemplar/Dragoon_Defend, don't switch to a new strategy
 	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Citadel_of_Adun) > 0) 
 	{
-		if (current_strategy == StrategyManager::PROTOSS_DRAGOON_DEFEND) 
+		if (best_strategy == StrategyManager::PROTOSS_DRAGOON_DEFEND) 
 		{
-			strategy = current_strategy;
+			strategy = best_strategy;
 		} else
 		{
 			strategy = StrategyManager::PROTOSS_DARK_TEMPLAR;
@@ -140,9 +141,9 @@ void DynamicStrategyManager::searchNewStrategy()
 	if (BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge) > 0) 
 	{
 
-		if (current_strategy == StrategyManager::PROTOSS_DRAGOON_DEFEND) 
+		if (best_strategy == StrategyManager::PROTOSS_DRAGOON_DEFEND) 
 		{
-			strategy = current_strategy;
+			strategy = best_strategy;
 		} else
 		{
 			strategy =  StrategyManager::PROTOSS_DRAGOONS;
@@ -151,7 +152,7 @@ void DynamicStrategyManager::searchNewStrategy()
 	}
 
 	// currently we do not change the scout rush strategy once it has begun
-	if (current_strategy == StrategyManager::PROTOSS_SCOUT_RUSH)
+	if (best_strategy == StrategyManager::PROTOSS_SCOUT_RUSH)
 	{
 		strategy = StrategyManager::PROTOSS_SCOUT_RUSH;
 	}		

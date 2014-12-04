@@ -177,10 +177,10 @@ void StrategyManager::setStrategy()
 	if (Options::Modules::USING_STRATEGY_IO)
 	{
 		double bestUCB = -1;
-		std::string bestStrategyName;
+		//std::string bestStrategyName; //this was promoted to class scope
 
 		std::vector<std::string>::iterator usableIter;
-
+		bestStrategyName =  PROTOSS_ZEALOT_RUSH;
 		// UCB requires us to try everything once before using the formula
 		for (usableIter = usableStrategies.begin(); usableIter != usableStrategies.end(); ++usableIter) 
 		{
@@ -206,7 +206,8 @@ void StrategyManager::setStrategy()
 				bestStrategyName = resultsIter->first;
 			}
 		}
-		currentStrategy = bestStrategyName;
+		//currentStrategy = bestStrategyName;
+		currentStrategy = PROTOSS_ZEALOT_RUSH; //hardcoded zealot start strategy
 		lastStrategy = currentStrategy;
 
 
@@ -894,4 +895,9 @@ void StrategyManager::setCurrentStrategy(std::string new_strategy)
 void StrategyManager::setLastStrategy(std::string current_strategy)
 {
 	lastStrategy = current_strategy;
+}
+
+const std::string StrategyManager::getBestStrategyName()
+{
+	return bestStrategyName;
 }

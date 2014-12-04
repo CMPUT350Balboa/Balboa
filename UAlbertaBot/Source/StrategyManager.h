@@ -31,6 +31,7 @@ class StrategyManager
 
 	std::string					currentStrategy;
 	std::string					lastStrategy;
+	std::string					bestStrategyName;
 
 	BWAPI::Race					selfRace;
 	BWAPI::Race					enemyRace;
@@ -106,7 +107,7 @@ public:
 	const	std::string			getLastStrategy(); // accessor returns previous strategy 
 	void						setCurrentStrategy(std::string new_strategy);	// accessor sets the current strategy
 	void						setLastStrategy(std::string current_strategy);	// accessor sets the previous strategy
-
+	const	std::string			getBestStrategyName();
 
 	const	MetaPairVector		getBuildOrderGoal();
 	const	std::string			getOpeningBook() const;
